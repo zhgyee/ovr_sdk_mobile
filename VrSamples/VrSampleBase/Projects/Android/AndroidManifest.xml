@@ -19,7 +19,8 @@
 			android:icon="@drawable/ic_launcher"
 			android:label="@string/app_name" >
 		<meta-data android:name="com.samsung.android.vr.application.mode" android:value="vr_only"/>
-		<!-- launchMode is set to singleTask because there should never be multiple copies of the app running -->
+    <meta-data android:name="com.oculus.supportedDevices" android:value="all" />
+    <!-- launchMode is set to singleTask because there should never be multiple copies of the app running -->
 		<!-- Theme.Black.NoTitleBar.Fullscreen gives solid black instead of a (bad stereoscopic) gradient on app transition -->
 		<!-- If targeting API level 24+, configChanges should additionally include 'density'. -->
 		<!-- If targeting API level 24+, android:resizeableActivity="false" should be added. -->

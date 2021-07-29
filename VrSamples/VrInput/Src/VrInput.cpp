@@ -480,9 +480,8 @@ ovrVrInput::ovrVrInput(
       ControllerModelOculusGoPreLit(nullptr),
       ControllerModelOculusTouchLeft(nullptr),
       ControllerModelOculusTouchRight(nullptr),
-      LastGamepadUpdateTimeInSeconds(0),
+            LastGamepadUpdateTimeInSeconds(0),
       Ribbons{nullptr, nullptr},
-      DeviceType(ovrDeviceType::VRAPI_DEVICE_TYPE_UNKNOWN),
       ActiveInputDeviceID(uint32_t(-1)) {}
 
 //==============================
@@ -500,7 +499,7 @@ ovrVrInput::~ovrVrInput() {
     ControllerModelOculusTouchLeft = nullptr;
     delete ControllerModelOculusTouchRight;
     ControllerModelOculusTouchRight = nullptr;
-    delete SoundEffectPlayer;
+        delete SoundEffectPlayer;
     SoundEffectPlayer = nullptr;
     delete RemoteBeamRenderer;
     RemoteBeamRenderer = nullptr;
@@ -721,6 +720,7 @@ bool ovrVrInput::AppInit(const OVRFW::ovrAppContext* context) {
         }
     }
 
+    
     {
         MaterialParms materialParms;
         materialParms.UseSrgbTextureFormats = false;
@@ -773,16 +773,8 @@ bool ovrVrInput::AppInit(const OVRFW::ovrAppContext* context) {
         pose.Translation = Vector3f(0.0f, 1.0f, -2.0f);
         Menu->SetMenuPose(pose);
 
-        DeviceType = (ovrDeviceType)vrapi_GetSystemPropertyInt(java, VRAPI_SYS_PROP_DEVICE_TYPE);
-        if (DeviceType >= VRAPI_DEVICE_TYPE_OCULUSGO_START &&
-            DeviceType <= VRAPI_DEVICE_TYPE_OCULUSGO_END) {
-            SetObjectText(*GuiSys, Menu, "panel", "VrInput (Oculus Go)");
-        } else if (
-            DeviceType >= VRAPI_DEVICE_TYPE_OCULUSQUEST_START &&
-            DeviceType <= VRAPI_DEVICE_TYPE_OCULUSQUEST_END) {
-            SetObjectText(*GuiSys, Menu, "panel", "VrInput (Oculus Quest)");
-        }
-            }
+        SetObjectText(*GuiSys, Menu, "panel", "VrInput");
+    }
 
     LastGamepadUpdateTimeInSeconds = 0.0;
 
@@ -844,13 +836,13 @@ static void RenderBones(
     const uint16_t beamAtlasIndex,
     const Posef& worldPose,
     const std::vector<ovrJoint>& joints,
-    std::vector<ovrPairT<ovrParticleSystem::handle_t, ovrBeamRenderer::handle_t>>& handles) {
+    jointHandles_t& handles) {
     for (int i = 0; i < static_cast<int>(joints.size()); ++i) {
         const ovrJoint& joint = joints[i];
         const Posef jw = worldPose * joint.Pose;
 
-        if (!handles[i].First.IsValid()) {
-            handles[i].First = ps->AddParticle(
+        if (!handles[i].first.IsValid()) {
+            handles[i].first = ps->AddParticle(
                 frame,
                 jw.Translation,
                 0.0f,
@@ -865,7 +857,7 @@ static void RenderBones(
         } else {
             ps->UpdateParticle(
                 frame,
-                handles[i].First,
+                handles[i].first,
                 jw.Translation,
                 0.0f,
                 Vector3f(0.0f),
@@ -881,8 +873,8 @@ static void RenderBones(
         if (i > 0) {
             const ovrJoint& parentJoint = joints[joint.ParentIndex];
             const Posef pw = worldPose * parentJoint.Pose;
-            if (!handles[i].Second.IsValid()) {
-                handles[i].Second = br->AddBeam(
+            if (!handles[i].second.IsValid()) {
+                handles[i].second = br->AddBeam(
                     frame,
                     beamAtlas,
                     beamAtlasIndex,
@@ -894,7 +886,7 @@ static void RenderBones(
             } else {
                 br->UpdateBeam(
                     frame,
-                    handles[i].Second,
+                    handles[i].second,
                     beamAtlas,
                     beamAtlasIndex,
                     0.064f,
@@ -908,13 +900,13 @@ static void RenderBones(
 
 static void ResetBones(ovrParticleSystem* ps, ovrBeamRenderer* br, jointHandles_t& handles) {
     for (int i = 0; i < static_cast<int>(handles.size()); ++i) {
-        if (handles[i].First.IsValid()) {
-            ps->RemoveParticle(handles[i].First);
-            handles[i].First.Release();
+        if (handles[i].first.IsValid()) {
+            ps->RemoveParticle(handles[i].first);
+            handles[i].first.Release();
         }
-        if (handles[i].Second.IsValid()) {
-            br->RemoveBeam(handles[i].Second);
-            handles[i].Second.Release();
+        if (handles[i].second.IsValid()) {
+            br->RemoveBeam(handles[i].second);
+            handles[i].second.Release();
         }
     }
 }
@@ -1115,17 +1107,14 @@ void ovrVrInput::RenderRunningFrame(
 
             Matrix4f mat = Matrix4f(tracking.HeadPose.Pose);
 
-            float controllerPitch = 0.0f;
-            if (trDevice.GetTrackedRemoteCaps().ControllerCapabilities &
-                ovrControllerCaps_ModelOculusTouch) {
-                controllerPitch = OVR::DegreeToRad(-90.0f);
-            }
-
             std::vector<ovrDrawSurface>& controllerSurfaces = trDevice.GetControllerSurfaces();
-            const float controllerYaw = OVR::DegreeToRad(180.0f);
+            float controllerYaw = 0.0f;
+            if (trDevice.GetTrackedRemoteCaps().ControllerCapabilities &
+                ovrControllerCaps_ModelOculusGo) {
+                controllerYaw = OVR::DegreeToRad(180.0f);
+            }
             for (uint32_t k = 0; k < controllerSurfaces.size(); k++) {
-                controllerSurfaces[k].modelMatrix =
-                    mat * Matrix4f::RotationY(controllerYaw) * Matrix4f::RotationX(controllerPitch);
+                controllerSurfaces[k].modelMatrix = mat * Matrix4f::RotationY(controllerYaw);
             }
 
             trDevice.UpdateHaptics(GetSessionObject(), in);
@@ -1510,7 +1499,8 @@ ovrResult ovrVrInput::PopulateRemoteControllerInfo(
     if ((inputTrackedRemoteCapabilities->ControllerCapabilities &
          ovrControllerCaps_ModelOculusGo) != 0) {
         SetObjectText(*GuiSys, Menu, headerObjectName.c_str(), "Oculus Go Controller");
-    } else if (
+    }
+        else if (
         (inputTrackedRemoteCapabilities->ControllerCapabilities &
          ovrControllerCaps_ModelOculusTouch) != 0) {
         SetObjectText(*GuiSys, Menu, headerObjectName.c_str(), "Oculus Touch Controller");
@@ -1929,15 +1919,15 @@ void ovrVrInput::OnDeviceConnected(const ovrInputCapabilityHeader& capsHeader) {
                     *static_cast<ovrInputDevice_TrackedRemote*>(device);
                 std::vector<ovrDrawSurface>& controllerSurfaces = trDevice.GetControllerSurfaces();
                 ModelFile* modelFile = ControllerModelOculusGo;
-                if (trDevice.GetTrackedRemoteCaps().ControllerCapabilities &
-                    ovrControllerCaps_ModelOculusTouch) {
-                    if (trDevice.GetHand() == ovrArmModel::HAND_LEFT) {
-                        modelFile = ControllerModelOculusTouchLeft;
-                    } else {
-                        modelFile = ControllerModelOculusTouchRight;
+                                    if (trDevice.GetTrackedRemoteCaps().ControllerCapabilities &
+                        ovrControllerCaps_ModelOculusTouch) {
+                        if (trDevice.GetHand() == ovrArmModel::HAND_LEFT) {
+                            modelFile = ControllerModelOculusTouchLeft;
+                        } else {
+                            modelFile = ControllerModelOculusTouchRight;
+                        }
                     }
-                }
-
+                    
                 controllerSurfaces.clear();
                 for (auto& model : modelFile->Models) {
                     ovrDrawSurface controllerSurface;
@@ -2036,7 +2026,7 @@ ovrInputDeviceBase* ovrInputDevice_TrackedRemote::Create(
             remoteCapabilities.TrackpadSizeX,
             remoteCapabilities.TrackpadSizeY);
 
-        device->ArmModel.InitSkeleton();
+        device->ArmModel.InitSkeleton(controllerHand == ovrArmModel::HAND_LEFT);
         device->JointHandles.resize(device->ArmModel.GetSkeleton().GetJoints().size());
 
         device->HapticState = 0;

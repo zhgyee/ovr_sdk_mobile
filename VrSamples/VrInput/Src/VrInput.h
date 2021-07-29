@@ -14,9 +14,10 @@ Copyright   :   Copyright (c) Facebook Technologies, LLC and its affiliates. All
 #include <string>
 #include <memory>
 
+#include "VrApi_Input.h"
+
 #include "Appl.h"
 #include "OVR_FileSys.h"
-
 #include "Model/SceneView.h"
 #include "Render/SurfaceRender.h"
 #include "Render/DebugLines.h"
@@ -25,10 +26,7 @@ Copyright   :   Copyright (c) Facebook Technologies, LLC and its affiliates. All
 #include "Render/ParticleSystem.h"
 #include "Render/Ribbon.h"
 #include "GUI/GuiSys.h"
-
-#include "VrApi_Input.h"
-
-#include "OVR_ArmModel.h"
+#include "Input/ArmModel.h"
 
 namespace OVRFW {
 
@@ -38,7 +36,7 @@ class ovrParticleSystem;
 class ovrTextureAtlas;
 class ovrBeamRenderer;
 
-typedef std::vector<ovrPairT<ovrParticleSystem::handle_t, ovrBeamRenderer::handle_t>>
+typedef std::vector<std::pair<ovrParticleSystem::handle_t, ovrBeamRenderer::handle_t>>
     jointHandles_t;
 
 //==============================================================
@@ -230,7 +228,7 @@ class ovrVrInput : public OVRFW::ovrAppl {
     ModelFile* ControllerModelOculusGoPreLit;
     ModelFile* ControllerModelOculusTouchLeft;
     ModelFile* ControllerModelOculusTouchRight;
-
+    
     OVR::Vector3f SpecularLightDirection;
     OVR::Vector3f SpecularLightColor;
     OVR::Vector3f AmbientLightColor;
@@ -250,8 +248,6 @@ class ovrVrInput : public OVRFW::ovrAppl {
     std::vector<ovrInputDeviceBase*> InputDevices;
 
     ovrControllerRibbon* Ribbons[ovrArmModel::HAND_MAX];
-
-    ovrDeviceType DeviceType;
 
     uint32_t ActiveInputDeviceID;
 

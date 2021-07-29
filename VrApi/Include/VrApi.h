@@ -792,8 +792,6 @@ OVR_VRAPI_EXPORT ovrTextureSwapChain* vrapi_CreateTextureSwapChain(
 ///
 /// If isProtected is true, the surface swapchain will be created as a protected surface, ie for
 /// supporting secure video playback.
-///
-/// NOTE: These paths are not currently supported under Vulkan.
 OVR_VRAPI_EXPORT ovrTextureSwapChain* vrapi_CreateAndroidSurfaceSwapChain(int width, int height);
 OVR_VRAPI_EXPORT ovrTextureSwapChain*
 vrapi_CreateAndroidSurfaceSwapChain2(int width, int height, bool isProtected);
@@ -877,6 +875,27 @@ OVR_VRAPI_EXPORT ovrResult
 vrapi_SetExtraLatencyMode(ovrMobile* ovr, const ovrExtraLatencyMode mode);
 
 //-----------------------------------------------------------------
+// Color Space Management
+//-----------------------------------------------------------------
+
+/// Returns native color space description of the current HMD. This is *not* a "getter" function
+/// for vrapi_SetClientColorDesc function. It will only return a fixed value for the current HMD.
+///
+/// \return Returns an ovrHmdColorDesc.
+OVR_VRAPI_EXPORT ovrHmdColorDesc vrapi_GetHmdColorDesc(ovrMobile* ovr);
+
+/// Sets the color space actively being used by the client app.
+///
+/// This value does not have to follow the color space provided in ovr_GetHmdColorDesc. It should
+/// reflect the color space used in the final rendered frame the client has submitted to the SDK.
+/// If this function is never called, the session will keep using the default color space deemed
+/// appropriate by the runtime. See remarks in ovrColorSpace enum for more info on default behavior.
+///
+/// \return Returns an ovrResult indicating success or failure.
+OVR_VRAPI_EXPORT ovrResult
+vrapi_SetClientColorDesc(ovrMobile* ovr, const ovrHmdColorDesc* colorDesc);
+
+//-----------------------------------------------------------------
 // Display Refresh Rate
 //-----------------------------------------------------------------
 
@@ -903,6 +922,7 @@ OVR_VRAPI_EXPORT ovrResult vrapi_SetDisplayRefreshRate(ovrMobile* ovr, const flo
 /// Returns ovrSuccess if no error occured.
 /// If no events are pending the event header EventType will be VRAPI_EVENT_NONE.
 OVR_VRAPI_EXPORT ovrResult vrapi_PollEvent(ovrEventHeader* event);
+
 
 
 #if defined(__cplusplus)

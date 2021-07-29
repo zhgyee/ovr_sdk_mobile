@@ -276,6 +276,13 @@ OVR_VRAPI_DEPRECATED(typedef struct ovrInputStateGamepad_ {
 // Hand tracking
 //-----------------------------------------------------------------
 
+/// Specifies left or right handedness.
+typedef enum ovrHandedness_ {
+    VRAPI_HAND_UNKNOWN = 0,
+    VRAPI_HAND_LEFT = 1,
+    VRAPI_HAND_RIGHT = 2
+} ovrHandedness;
+
 //-----------------------------------------------------------------
 // Hand capabilities
 typedef enum ovrHandCapabilities_ {
@@ -430,7 +437,11 @@ typedef enum ovrInputStateHandStatus_ {
         (1 << 5), // if this is set the pinch gesture for that finger is on
     ovrInputStateHandStatus_SystemGestureProcessing =
         (1 << 6), // if this is set the hand is currently processing a system gesture
-        ovrInputStateHandStatus_EnumSize = 0x7fffffff
+    ovrInputStateHandStatus_DominantHand =
+        (1 << 7), // if this is set the hand is considered the dominant hand
+    ovrInputStateHandStatus_MenuPressed =
+        (1 << 8), // if this is set the hand performed the system gesture as the non-dominant hand
+    ovrInputStateHandStatus_EnumSize = 0x7fffffff
 } ovrInputStateHandStatus;
 
 // Pass this structure to vrapi_GetCurrentInputState() with a device id for a hand to get the

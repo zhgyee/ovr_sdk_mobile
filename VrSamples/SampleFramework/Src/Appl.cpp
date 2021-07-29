@@ -132,7 +132,7 @@ bool ovrAppl::Init(const ovrAppContext* context, const ovrInitParms* initParms) 
 
     int32_t result = VRAPI_INITIALIZE_SUCCESS;
     if (initParms == nullptr) {
-        const ovrInitParms localInitParms = vrapi_DefaultInitParms(java);
+        ovrInitParms localInitParms = vrapi_DefaultInitParms(java);
         result = vrapi_Initialize(&localInitParms);
     } else {
         result = vrapi_Initialize(initParms);
@@ -274,6 +274,12 @@ void ovrAppl::HandleLifecycle(const ovrAppContext* context) {
                         SessionObject, VRAPI_PERF_THREAD_TYPE_RENDERER, RenderThreadTid);
                 }
                 vrapi_SetTrackingSpace(SessionObject, VRAPI_TRACKING_SPACE_LOCAL_FLOOR);
+            }
+
+            {
+                ovrHmdColorDesc colorDesc{};
+                colorDesc.ColorSpace = VRAPI_COLORSPACE_QUEST;
+                vrapi_SetClientColorDesc(SessionObject, &colorDesc);
             }
 
             SubmitLoadingIcon(SessionObject, GetFrameIndex(), GetDisplayTime());
