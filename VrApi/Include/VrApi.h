@@ -971,6 +971,7 @@ OVR_VRAPI_EXPORT ovrResult vrapi_PollEvent(ovrEventHeader* event);
 
 
 
+
 #if defined(__cplusplus)
 } // extern "C"
 #endif

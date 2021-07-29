@@ -33,9 +33,6 @@ using OVR::Vector4f;
 
 namespace OVRFW {
 
-static const Vector4f MENU_DEFAULT_COLOR(0.0f, 0.0f, 0.1f, 1.0f);
-static const Vector4f MENU_HIGHLIGHT_COLOR(0.8f, 1.0f, 0.8f, 1.0f);
-
 static const char* MenuDefinitionFile = R"menu_definition(
 itemParms {
   // panel
@@ -184,7 +181,7 @@ void TinyUI::Update(const OVRFW::ovrApplFrameIn& in) {
     /// clear previous frame
     for (auto& device : PreviousFrameDevices) {
         if (device.hitObject) {
-            device.hitObject->SetSurfaceColor(0, MENU_DEFAULT_COLOR);
+            device.hitObject->SetSurfaceColor(0, BackgroundColor);
         }
     }
 
@@ -200,12 +197,16 @@ void TinyUI::Update(const OVRFW::ovrApplFrameIn& in) {
             device.pointerEnd = pointerStart + hit.RayDir * hit.t - pointerDir * 0.025f;
             device.hitObject = GuiSys->GetVRMenuMgr().ToObject(hit.HitHandle);
             if (device.hitObject != nullptr) {
-                device.hitObject->SetSurfaceColor(0, MENU_HIGHLIGHT_COLOR);
-                pointerEnd = targetEnd;
-                // check hit-testing
-                if (device.clicked) {
-                    auto it = ButtonHandlers.find(device.hitObject);
-                    if (it != ButtonHandlers.end()) {
+                /// we hit a menu, make sure it is a button with a registered handler
+                auto it = ButtonHandlers.find(device.hitObject);
+                if (it != ButtonHandlers.end()) {
+                    /// hover highlight
+                    device.hitObject->SetSurfaceColor(0, HoverColor);
+                    pointerEnd = targetEnd;
+                    if (device.clicked) {
+                        // click highlight
+                        device.hitObject->SetSurfaceColor(0, HighlightColor);
+                        // run event handler
                         it->second();
                     }
                 }
@@ -220,18 +221,20 @@ void TinyUI::Update(const OVRFW::ovrApplFrameIn& in) {
 void TinyUI::Render(const OVRFW::ovrApplFrameIn& in, OVRFW::ovrRendererOutput& out) {
     const Matrix4f& traceMat = out.FrameMatrices.CenterView.Inverted();
     GuiSys->Frame(in, out.FrameMatrices.CenterView, traceMat);
-
     GuiSys->AppendSurfaceList(out.FrameMatrices.CenterView, &out.Surfaces);
 }
 
 OVRFW::VRMenuObject* TinyUI::CreateMenu(
     const std::string& labelText,
     const OVR::Vector3f& position,
-    const OVR::Vector2f& size,
-    const std::string& postfix) {
-    std::string menuName = "target_";
-    menuName += labelText;
-    menuName += postfix;
+    const OVR::Vector2f& size) {
+    /// common naming
+    static uint32_t menuIndex = 3000;
+    menuIndex++;
+    std::stringstream ss;
+    ss << std::setprecision(4) << std::fixed;
+    ss << "tinyui_menu_" << menuIndex << "_";
+    std::string menuName = ss.str();
     VRMenu* m = SimpleTargetMenu::Create(*GuiSys, *Locale, menuName, labelText);
     if (m != nullptr) {
         GuiSys->AddMenu(m);
@@ -245,8 +248,10 @@ OVRFW::VRMenuObject* TinyUI::CreateMenu(
             mo = menuMgr.ToObject(mo->GetChildHandleForIndex(0));
             mo->SetSurfaceDims(0, size);
             mo->RegenerateSurfaceGeometry(0, false);
+            /// remember everything
+            AllElements.push_back(mo);
+            return mo;
         }
-        return mo;
     }
     return nullptr;
 }
@@ -254,19 +259,41 @@ OVRFW::VRMenuObject* TinyUI::CreateMenu(
 OVRFW::VRMenuObject* TinyUI::AddLabel(
     const std::string& labelText,
     const OVR::Vector3f& position,
-    const OVR::Vector2f& size,
-    const std::string& postfix) {
-    return CreateMenu(labelText, position, size, postfix);
+    const OVR::Vector2f& size) {
+    return CreateMenu(labelText, position, size);
 }
 
 OVRFW::VRMenuObject* TinyUI::AddButton(
     const std::string& label,
     const OVR::Vector3f& position,
     const OVR::Vector2f& size,
-    const std::function<void(void)>& handler,
-    const std::string& postfix) {
-    auto b = CreateMenu(label, position, size, postfix);
+    const std::function<void(void)>& handler) {
+    auto b = CreateMenu(label, position, size);
     if (b && handler) {
+        ButtonHandlers[b] = handler;
+    }
+    return b;
+}
+
+OVRFW::VRMenuObject* TinyUI::AddToggleButton(
+    const std::string& labelTextOn,
+    const std::string& labelTextOff,
+    bool* value,
+    const OVR::Vector3f& position,
+    const OVR::Vector2f& size,
+    const std::function<void(void)>& postHandler) {
+    auto b = CreateMenu("", position, size);
+    const std::function<void(void)>& handler = [=]() {
+        if (b) {
+            *value = !(*value);
+            b->SetText(*value ? labelTextOn.c_str() : labelTextOff.c_str());
+            if (postHandler) {
+                postHandler();
+            }
+        }
+    };
+    if (b && handler && value) {
+        b->SetText(*value ? labelTextOn.c_str() : labelTextOff.c_str());
         ButtonHandlers[b] = handler;
     }
     return b;
@@ -278,13 +305,10 @@ OVRFW::VRMenuObject* TinyUI::AddSlider(
     float* value,
     const float defaultValue,
     const float delta) {
-    VRMenuObject* lb = CreateMenu(label, position, {150.0f, 50.0f}, "lbl");
-    VRMenuObject* lt =
-        CreateMenu("-", position + Vector3f{0.20f, 0.0f, 0.0f}, {50.0f, 50.0f}, label);
-    VRMenuObject* val =
-        CreateMenu("0.0", position + Vector3f{0.35f, 0.0f, 0.0f}, {100.0f, 50.0f}, label);
-    VRMenuObject* gt =
-        CreateMenu("+", position + Vector3f{0.50f, 0.0f, 0.0f}, {50.0f, 50.0f}, label);
+    VRMenuObject* lb = CreateMenu(label, position, {150.0f, 50.0f});
+    VRMenuObject* lt = CreateMenu("-", position + Vector3f{0.20f, 0.0f, 0.0f}, {50.0f, 50.0f});
+    VRMenuObject* val = CreateMenu("0.0", position + Vector3f{0.35f, 0.0f, 0.0f}, {100.0f, 50.0f});
+    VRMenuObject* gt = CreateMenu("+", position + Vector3f{0.50f, 0.0f, 0.0f}, {50.0f, 50.0f});
 
     auto udpateText = [=]() {
         std::stringstream ss;
@@ -307,6 +331,29 @@ OVRFW::VRMenuObject* TinyUI::AddSlider(
     ButtonHandlers[lb] = [=]() { udpateText(); };
     udpateText();
     return lb;
+}
+
+void TinyUI::ShowAll() {
+    ForAll([](VRMenuObject* menu) { menu->SetVisible(true); });
+}
+void TinyUI::HideAll(const std::vector<VRMenuObject*>& exceptions) {
+    ForAll([=](VRMenuObject* menu) {
+        for (const VRMenuObject* e : exceptions) {
+            if (e == menu)
+                return;
+        }
+        menu->SetVisible(false);
+    });
+}
+
+void TinyUI::ForAll(const std::function<void(VRMenuObject*)>& handler) {
+    if (handler) {
+        for (VRMenuObject* menu : AllElements) {
+            if (menu) {
+                handler(menu);
+            }
+        }
+    }
 }
 
 } // namespace OVRFW

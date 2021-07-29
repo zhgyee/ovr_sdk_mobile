@@ -29,8 +29,9 @@ limitations under the License.
 
 #include <atomic>
 #include <memory>
+#include <cstring> // memcpy
 
-#if defined(OVR_OS_WIN32)
+#if defined(OVR_OS_WIN32) || defined(_WIN32) || defined(_WIN64)
 #define NOMINMAX // stop Windows.h from redefining min and max and breaking std::min / std::max
 #include <windows.h> // for MemoryBarrier
 #endif
@@ -83,7 +84,7 @@ class LocklessUpdater {
             state = Slots[end & 1];
 // Manually insert an memory barrier here in order to ensure that
 // memory access between Slots[] and UpdateBegin are properly ordered
-#if defined(OVR_CC_MSVC)
+#if defined(OVR_CC_MSVC) || defined(_WIN32) || defined(_WIN64)
             MemoryBarrier();
 #else
             __sync_synchronize();
@@ -96,7 +97,7 @@ class LocklessUpdater {
             // The producer is potentially blocked while only having partially
             // written the update, so copy out the other slot.
             state = Slots[(begin & 1) ^ 1];
-#if defined(OVR_CC_MSVC)
+#if defined(OVR_CC_MSVC) || defined(_WIN32) || defined(_WIN64)
             MemoryBarrier();
 #else
             __sync_synchronize();

@@ -22,7 +22,9 @@ Copyright   :   Copyright (c) Facebook Technologies, LLC and its affiliates. All
 #include <assert.h>
 
 #if defined(WIN32) || defined(WIN64) || defined(_WIN32) || defined(_WIN64)
+#if !defined(NOMINMAX)
 #define NOMINMAX // stop Windows.h from redefining min and max and breaking std::min / std::max
+#endif
 #include <windows.h> // OutputDebugString
 #endif
 

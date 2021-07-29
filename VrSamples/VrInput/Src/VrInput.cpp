@@ -1332,11 +1332,15 @@ ovrResult ovrVrInput::PopulateRemoteControllerInfo(ovrInputDevice_TrackedRemote&
     if (remoteInputState.Touches & ovrTouch_A && remoteInputState.Buttons & ovrButton_A) {
         buttons += "A ";
         SetObjectColor(
-            *GuiSys, Menu, aButtonObjectName.c_str(), Vector4f(0.25f, 0.25f, 1.0f, 1.0f));
+            *GuiSys, Menu, aButtonObjectName.c_str(), Vector4f(1.0f, 0.25f, 0.25f, 1.0f));
     } else if (remoteInputState.Touches & ovrTouch_A) {
         buttons += "A ";
         SetObjectColor(
             *GuiSys, Menu, aButtonObjectName.c_str(), Vector4f(0.25f, 1.0f, 0.25f, 1.0f));
+    } else if (remoteInputState.Buttons & ovrButton_A) {
+        buttons += "A ";
+        SetObjectColor(
+            *GuiSys, Menu, bButtonObjectName.c_str(), Vector4f(0.25f, 0.25f, 1.0f, 1.0f));
     }
 
     if (remoteInputState.Touches & ovrTouch_B && remoteInputState.Buttons & ovrButton_B) {

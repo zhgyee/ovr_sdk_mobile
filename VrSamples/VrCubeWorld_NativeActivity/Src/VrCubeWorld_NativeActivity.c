@@ -1360,10 +1360,8 @@ static ovrLayerProjection2 ovrRenderer_RenderFrame(
         GL(glCullFace(GL_BACK));
         GL(glViewport(0, 0, frameBuffer->Width, frameBuffer->Height));
         GL(glScissor(0, 0, frameBuffer->Width, frameBuffer->Height));
-        GL(glClearColor(0.016f, 0.0f, 0.016f, 1.0f));
-        GL(glEnable(GL_FRAMEBUFFER_SRGB_EXT));
+        GL(glClearColor(0.125f, 0.0f, 0.125f, 1.0f));
         GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-        GL(glDisable(GL_FRAMEBUFFER_SRGB_EXT));
         GL(glBindVertexArray(scene->Cube.VertexArrayObject));
         GL(glDrawElementsInstanced(
             GL_TRIANGLES, scene->Cube.IndexCount, GL_UNSIGNED_SHORT, NULL, NUM_INSTANCES));

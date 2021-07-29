@@ -107,18 +107,24 @@ void SimpleInput::UpdateFromSensors(ovrMobile* ovr, double displayTimeInSeconds)
 
     /// Controllers
     if (IsLeftControllerTracked()) {
+        prevRemoteInputStateL_ = frame_.remoteInputStateL_;
         frame_.remoteInputStateL_.Header.ControllerType = ovrControllerType_TrackedRemote;
         (void)vrapi_GetCurrentInputState(
             ovr, frame_.controllerL_, &frame_.remoteInputStateL_.Header);
         (void)vrapi_GetInputTrackingState(
             ovr, frame_.controllerL_, displayTimeInSeconds, &frame_.controllerPoseL_);
+    } else {
+        prevRemoteInputStateL_ = {};
     }
     if (IsRightControllerTracked()) {
+        prevRemoteInputStateR_ = frame_.remoteInputStateR_;
         frame_.remoteInputStateR_.Header.ControllerType = ovrControllerType_TrackedRemote;
         (void)vrapi_GetCurrentInputState(
             ovr, frame_.controllerR_, &frame_.remoteInputStateR_.Header);
         (void)vrapi_GetInputTrackingState(
             ovr, frame_.controllerR_, displayTimeInSeconds, &frame_.controllerPoseR_);
+    } else {
+        prevRemoteInputStateR_ = {};
     }
 }
 

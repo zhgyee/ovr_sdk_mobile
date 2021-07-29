@@ -89,6 +89,20 @@ class SimpleInput {
         return (handInputStatePrevR_.InputStateStatus & ovrInputStateHandStatus_IndexPinching) != 0;
     }
 
+    // Controller Button State
+    bool IsLeftHandTriggerDown() const {
+        return IsLeftControllerTracked() && frame_.remoteInputStateL_.IndexTrigger > 0.1f;
+    }
+    bool IsLeftHandTriggerPressed() const {
+        return IsLeftHandTriggerDown() && prevRemoteInputStateL_.IndexTrigger <= 0.1f;
+    }
+    bool IsRightHandTriggerDown() const {
+        return IsRightControllerTracked() && frame_.remoteInputStateR_.IndexTrigger > 0.1f;
+    }
+    bool IsRightHandTriggerPressed() const {
+        return IsRightHandTriggerDown() && prevRemoteInputStateR_.IndexTrigger <= 0.1f;
+    }
+
     /// Raw tracking
     const ovrTracking2& HeadTracking() const {
         return frame_.head_;
@@ -202,6 +216,9 @@ class SimpleInput {
     /// helpers
     ovrInputStateHand handInputStatePrevL_;
     ovrInputStateHand handInputStatePrevR_;
+
+    ovrInputStateTrackedRemote prevRemoteInputStateL_;
+    ovrInputStateTrackedRemote prevRemoteInputStateR_;
 
     /// serialization
     bool isRecording_;

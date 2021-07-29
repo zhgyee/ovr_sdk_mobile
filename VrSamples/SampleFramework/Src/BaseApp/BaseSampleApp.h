@@ -117,9 +117,13 @@ class BaseSampleApp : public OVRFW::ovrSurfaceRenderApp {
             }
             if (simpleInput_.IsLeftControllerTracked()) {
                 controllerRenderL_.Update(simpleInput_.LeftControllerPose());
+                const OVR::Posef& ray = simpleInput_.LeftControllerPose();
+                ui_.AddHitTestRay(ray, simpleInput_.IsLeftHandTriggerPressed());
             }
             if (simpleInput_.IsRightControllerTracked()) {
                 controllerRenderR_.Update(simpleInput_.RightControllerPose());
+                const OVR::Posef& ray = simpleInput_.RightControllerPose();
+                ui_.AddHitTestRay(ray, simpleInput_.IsRightHandTriggerPressed());
             }
         }
         ui_.Update(in);

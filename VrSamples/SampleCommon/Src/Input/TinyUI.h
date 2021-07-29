@@ -42,20 +42,25 @@ class TinyUI {
     OVRFW::VRMenuObject* AddLabel(
         const std::string& labelText,
         const OVR::Vector3f& position,
-        const OVR::Vector2f& size = {100.0f, 50.0f},
-        const std::string& postfix = "");
+        const OVR::Vector2f& size = {100.0f, 50.0f});
     OVRFW::VRMenuObject* AddButton(
         const std::string& label,
         const OVR::Vector3f& position,
         const OVR::Vector2f& size = {100.0f, 50.0f},
-        const std::function<void(void)>& handler = {},
-        const std::string& postfix = "");
+        const std::function<void(void)>& handler = {});
     OVRFW::VRMenuObject* AddSlider(
         const std::string& label,
         const OVR::Vector3f& position,
         float* value,
         const float defaultValue,
         const float delta = 0.02f);
+    OVRFW::VRMenuObject* AddToggleButton(
+        const std::string& labelTextOn,
+        const std::string& labelTextOff,
+        bool* value,
+        const OVR::Vector3f& position,
+        const OVR::Vector2f& size = {100.0f, 50.0f},
+        const std::function<void(void)>& postHandler = {});
 
     OVRFW::OvrGuiSys& GetGuiSys() {
         return *GuiSys;
@@ -63,22 +68,36 @@ class TinyUI {
     OVRFW::ovrLocale& GetLocale() {
         return *Locale;
     }
+
+    /// hit-testing
     std::vector<OVRFW::TinyUI::HitTestDevice>& HitTestDevices() {
         return Devices;
     }
-
     void AddHitTestRay(const OVR::Posef& ray, bool isClicking);
+
+    /// ui toggle
+    void ShowAll();
+    void HideAll(const std::vector<VRMenuObject*>& exceptions = std::vector<VRMenuObject*>());
+
+    /// general manipulation
+    void ForAll(const std::function<void(VRMenuObject*)>& handler = {});
+
+   public:
+    /// style
+    OVR::Vector4f BackgroundColor = {0.0f, 0.0f, 0.1f, 1.0f};
+    OVR::Vector4f HoverColor = {0.4f, 0.4f, 0.4f, 1.0f};
+    OVR::Vector4f HighlightColor = {0.8f, 1.0f, 0.8f, 1.0f};
 
    protected:
     OVRFW::VRMenuObject* CreateMenu(
         const std::string& labelText,
         const OVR::Vector3f& position,
-        const OVR::Vector2f& size,
-        const std::string& postfix);
+        const OVR::Vector2f& size);
 
    private:
     OVRFW::OvrGuiSys* GuiSys;
     OVRFW::ovrLocale* Locale;
+    std::vector<VRMenuObject*> AllElements;
     std::unordered_map<VRMenuObject*, std::function<void(void)>> ButtonHandlers;
     std::vector<OVRFW::TinyUI::HitTestDevice> Devices;
     std::vector<OVRFW::TinyUI::HitTestDevice> PreviousFrameDevices;

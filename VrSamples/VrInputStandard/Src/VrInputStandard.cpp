@@ -1308,10 +1308,6 @@ void ovrVrInputStandard::SubmitCompositorLayers(const ovrApplFrameIn& in, ovrRen
     ovrFramebuffer_SetNone();
 }
 
-#ifndef GL_FRAMEBUFFER_SRGB_EXT
-#define GL_FRAMEBUFFER_SRGB_EXT 0x8DB9
-#endif
-
 void ovrVrInputStandard::AppEyeGLStateSetup(const ovrApplFrameIn&, const ovrFramebuffer* fb, int) {
     GL(glEnable(GL_SCISSOR_TEST));
     GL(glDepthMask(GL_TRUE));
@@ -1320,9 +1316,14 @@ void ovrVrInputStandard::AppEyeGLStateSetup(const ovrApplFrameIn&, const ovrFram
     GL(glEnable(GL_CULL_FACE));
     GL(glViewport(0, 0, fb->Width, fb->Height));
     GL(glScissor(0, 0, fb->Width, fb->Height));
-    GL(glEnable(GL_FRAMEBUFFER_SRGB_EXT));
     GL(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
     GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+
+    // This app was originally written with the presumption that
+    // its swapchains and compositor front buffer were RGB.
+    // In order to have the colors the same now that its compositing
+    // to an sRGB front buffer, we have to write to an sRGB swapchain
+    // but with the linear->sRGB conversion disabled on write.
     GL(glDisable(GL_FRAMEBUFFER_SRGB_EXT));
 }
 
