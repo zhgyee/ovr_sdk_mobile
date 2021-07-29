@@ -41,6 +41,7 @@ void ovrSkeleton::SetJoints(const std::vector<ovrJoint>& newJoints) {
     }
 
     /// Set World
+    WorldSpaceDirty = true;
     UpdateWorldFromLocal();
 }
 

@@ -46,8 +46,10 @@ class ovrSkeleton {
     const std::vector<OVR::Posef>& GetLocalSpacePoses() const {
         return LocalSpacePoses;
     }
-    const std::vector<OVR::Posef>& GetWorldSpacePoses() const {
-        UpdateWorldFromLocal();
+    const std::vector<OVR::Posef>& GetWorldSpacePoses(bool updateFromLocal = true) const {
+        if (updateFromLocal) {
+            UpdateWorldFromLocal();
+        }
         return WorldSpacePoses;
     }
     void SetJoints(const std::vector<ovrJoint>& newJoints);

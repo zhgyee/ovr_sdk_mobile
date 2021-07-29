@@ -122,8 +122,8 @@ while ( !exit )
 		modeParms.ShareContext = eglContext;
 		ovrMobile * ovr = vrapi_EnterVrMode( &modeParms );
 
-		// Set the tracking transform to use, by default this is eye level.
-		vrapi_SetTrackingTransform( ovr, vrapi_GetTrackingTransform( ovr, VRAPI_TRACKING_TRANSFORM_SYSTEM_CENTER_EYE_LEVEL ) );
+		// Set the tracking space to use, by default this is eye level.
+		vrapi_SetTrackingSpace( ovr, VRAPI_TRACKING_SPACE_LOCAL );
 
 		// Frame loop, possibly running on another thread.
 		for ( long long frameIndex = 1; resumed && nativeWindow != NULL; frameIndex++ )
@@ -755,6 +755,9 @@ OVR_VRAPI_EXPORT ovrResult vrapi_GetBoundaryVisible(ovrMobile* ovr, bool* visibl
 /// If an unsupported format is provided, swapchain creation will fail.
 ///
 /// SwapChain creation failures result in a return value of 'nullptr'.
+OVR_VRAPI_EXPORT ovrTextureSwapChain* vrapi_CreateTextureSwapChain4(
+    const ovrSwapChainCreateInfo* createInfo);
+
 OVR_VRAPI_EXPORT ovrTextureSwapChain* vrapi_CreateTextureSwapChain3(
     ovrTextureType type,
     int64_t format,

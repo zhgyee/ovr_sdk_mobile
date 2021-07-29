@@ -101,7 +101,7 @@ class VrAppPlugin implements Plugin<Project> {
 	  buildToolsVersion '28.0.3'
 
 	  defaultConfig {
-		  minSdkVersion 23
+		  minSdkVersion 24
 		  targetSdkVersion 25
 
 		  externalNativeBuild {
@@ -109,7 +109,7 @@ class VrAppPlugin implements Plugin<Project> {
 			  }
 			  ndkBuild {
 				  def numProcs = Runtime.runtime.availableProcessors()
-				  arguments "V=0", "-j$numProcs", "-C$project.buildDir.parent", "APP_PLATFORM=android-21", "NDK_TOOLCHAIN_VERSION=clang", "APP_STL=c++_static"
+				  arguments "V=0", "-j$numProcs", "-C$project.buildDir.parent", "APP_PLATFORM=android-24", "NDK_TOOLCHAIN_VERSION=clang", "APP_STL=c++_static"
 			  }
 		  }
 	  }
@@ -139,7 +139,7 @@ class VrAppPlugin implements Plugin<Project> {
 			  storePassword keystorePassword
 			  keyAlias keystoreKeyAlias
 			  keyPassword keystoreKeyPassword
-			  v2SigningEnabled false
+			  v2SigningEnabled true
 		  }
 
 		  release {
@@ -147,7 +147,7 @@ class VrAppPlugin implements Plugin<Project> {
 			  storePassword keystorePassword
 			  keyAlias keystoreKeyAlias
 			  keyPassword keystoreKeyPassword
-			  v2SigningEnabled false
+			  v2SigningEnabled true
 		  }
 	  }
 

@@ -211,6 +211,16 @@ class LocklessUpdater2 {
     T Slots[2];
 };
 
+struct LocklessDataReaderState {
+    int32_t CountMasked = 0;
+    int32_t ReadIndex = 0;
+    int32_t BufferSize = 0;
+};
+
+struct LocklessDataWriterState {
+    int32_t WriteIndex = 0;
+};
+
 class LocklessDataHelper {
    public:
 #ifdef LOCKLESS_DATA_HELPER_CHECK_HASH
@@ -231,74 +241,77 @@ class LocklessDataHelper {
     LocklessDataHelper() : Count(0), DataSizes{0, 0} {}
 #endif
 
-    bool GetData(const uint8_t** buffers, uint8_t* outData, int32_t& outSize) const {
+    inline void GetDataBegin(LocklessDataReaderState& locker) const {
+        // Atomically load Count into a temporary variable (locker.CountMasked), to determine the
+        // index of the last-written buffer.
+        locker.CountMasked = Count.load(std::memory_order_acquire) & ~int32_t(1);
+        locker.ReadIndex = (locker.CountMasked >> 1) & 1;
+        locker.BufferSize = DataSizes[locker.ReadIndex];
+    }
+
+    inline bool GetDataEnd(LocklessDataReaderState& locker) const {
+        // After copying the data from that buffer, Count is atomically loaded into another
+        // temporary variable (c2). If the count changed at all, we know that a write to the
+        // buffers occured. Depending on the number of increments between c and c2, we can tell
+        // which buffers were written to. Our read is ok as long as the write was to the buffer
+        // we were not reading from.
+        const int c2 = Count.load(std::memory_order_acquire);
+        // * ( c2 - c ) == 0, no writes occured while the buffer was read the data is good.
+        // * ( c2 - c ) == 1, a write started, but it was in the buffer that wasn't read, so the
+        //   data read from the buffer is good.
+        // * ( c2 - c ) == 2, a write ended, but it was in the buffer that wasn't read, so the
+        //   data read from the buffer is good.
+        // * ( c2 - c ) == 3, a new write began in the buffer that was read, so the buffer is
+        //   likely to have partial data in it and must be re-read.
+        // * ( c2 - c ) > 3, multiple writes happened, at least one of which overwrote the
+        //   buffer that was  read, so the buffer may have partial data and should be re-read.
+        return ((c2 - locker.CountMasked) < 3);
+    }
+
+    inline bool GetData(const uint8_t** buffers, uint8_t* outData, int32_t& outSize) const {
         const int32_t inSize = outSize;
         outSize = 0;
 
         for (;;) {
-            // Atomically load Count into a temporary variable (c), to determine the index
-            // of the last-written buffer.
-            int c = Count.load(std::memory_order_acquire);
-
-            c &= ~int(1); // mask bit 0 so the differences below work
-
-            //  The last-written buffer is specified by bit 1 of the the variable c.
-            const int readIndex = (c >> 1) & 1;
-
-            // read the buffer into the buffer parameter
-            const int32_t size = DataSizes[readIndex];
-
-            if (size > inSize) {
+            LocklessDataReaderState locker;
+            GetDataBegin(locker);
+            if (locker.BufferSize > inSize) {
                 return false;
             }
 
-            std::memcpy(outData, buffers[readIndex], size);
+            std::memcpy(outData, buffers[locker.ReadIndex], locker.BufferSize);
 #ifdef LOCKLESS_DATA_HELPER_CHECK_HASH
-            const HashType expectedHash = Hashes[readIndex];
+            const HashType expectedHash = Hashes[locker.ReadIndex];
 #endif
 
-            // After copying the data from that buffer, Count is atomically loaded into another
-            // temporary variable (c2). If the count changed at all, we know that a write to the
-            // buffers occured. Depending on the number of increments between c and c2, we can tell
-            // which buffers were written to. Our read is ok as long as the write was to the buffer
-            // we were not reading from.
-            const int c2 = Count.load(std::memory_order_acquire);
-
-            // * ( c2 - c ) == 0, no writes occured while the buffer was read the data is good.
-            // * ( c2 - c ) == 1, a write started, but it was in the buffer that wasn't read, so the
-            //   data read from the buffer is good.
-            // * ( c2 - c ) == 2, a write ended, but it was in the buffer that wasn't read, so the
-            //   data read from the buffer is good.
-            // * ( c2 - c ) == 3, a new write began in the buffer that was read, so the buffer is
-            //   likely to have partial data in it and must be re-read.
-            // * ( c2 - c ) > 3, multiple writes happened, at least one of which overwrote the
-            //   buffer that was  read, so the buffer may have partial data and should be re-read.
-            if ((c2 - c) < 3) {
+            if (GetDataEnd(locker)) {
 #ifdef LOCKLESS_DATA_HELPER_CHECK_HASH
-                const HashType hash = HashBytes(outData, size);
+                const HashType hash = HashBytes(outData, locker.BufferSize);
                 if (hash != expectedHash) {
                     OVR_WARN(
                         "GetData hash mismatch: Size: %i, %llu != %llu",
-                        (int)size,
+                        (int)locker.BufferSize,
                         (unsigned long long int)hash,
                         (unsigned long long int)expectedHash);
                     return false;
                 }
 #endif
-                outSize = size;
+                outSize = locker.BufferSize;
                 return true;
             }
         }
     }
 
-    void SetData(uint8_t** buffers, const uint8_t* data, const int32_t size) {
-        const int writeIndex = ((Count.fetch_add(1) >> 1) + 1) & 1;
+    inline void SetDataBegin(LocklessDataWriterState& writer) {
+        writer.WriteIndex = ((Count.fetch_add(1) >> 1) + 1) & 1;
+    }
 
-        std::memcpy(buffers[writeIndex], data, size);
+    inline void
+    SetDataEnd(LocklessDataWriterState& writer, const uint8_t* data, const int32_t size) {
+        DataSizes[writer.WriteIndex] = size;
 
-        DataSizes[writeIndex] = size;
 #ifdef LOCKLESS_DATA_HELPER_CHECK_HASH
-        Hashes[writeIndex] = HashBytes(data, size);
+        Hashes[writer.WriteIndex] = HashBytes(data, size);
 #endif
 
         // memory barrier with release ensures that no write to memory before the fence
@@ -306,6 +319,15 @@ class LocklessDataHelper {
         std::atomic_thread_fence(std::memory_order_release);
         // atomic increment
         Count.fetch_add(1);
+    }
+
+    inline void SetData(uint8_t** buffers, const uint8_t* data, const int32_t size) {
+        LocklessDataWriterState writer;
+        SetDataBegin(writer);
+
+        std::memcpy(buffers[writer.WriteIndex], data, size);
+
+        SetDataEnd(writer, data, size);
     }
 
     std::atomic<int32_t> Count;

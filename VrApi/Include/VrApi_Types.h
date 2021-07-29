@@ -163,12 +163,6 @@ typedef enum ovrStructureType_ {
 /// A VR-capable device.
 typedef enum ovrDeviceType_ {
     
-    // Standalone Devices
-    VRAPI_DEVICE_TYPE_OCULUSGO_START = 64,
-    VRAPI_DEVICE_TYPE_OCULUSGO = VRAPI_DEVICE_TYPE_OCULUSGO_START,
-    VRAPI_DEVICE_TYPE_MIVR_STANDALONE = VRAPI_DEVICE_TYPE_OCULUSGO_START + 1, //< China-only SKU
-    VRAPI_DEVICE_TYPE_OCULUSGO_END = 127,
-
     VRAPI_DEVICE_TYPE_OCULUSQUEST_START = 256,
         VRAPI_DEVICE_TYPE_OCULUSQUEST = VRAPI_DEVICE_TYPE_OCULUSQUEST_START + 3,
     VRAPI_DEVICE_TYPE_OCULUSQUEST_END = 319,
@@ -273,12 +267,7 @@ typedef enum ovrSystemProperty_ {
 /// Configurable VrApi properties.
 typedef enum ovrProperty_ {
         VRAPI_FOVEATION_LEVEL = 15, //< Used by apps that want to control swapchain foveation levels.
-        VRAPI_REORIENT_HMD_ON_CONTROLLER_RECENTER =
-        17, //< Used to determine if a controller recenter should also reorient the headset.
-    VRAPI_LATCH_BACK_BUTTON_ENTIRE_FRAME =
-        18, //< Used to determine if the 'short press' back button should lasts an entire frame.
-    VRAPI_BLOCK_REMOTE_BUTTONS_WHEN_NOT_EMULATING_HMT =
-        19, //< Used to not send the remote back button java events to the apps.
+    
     VRAPI_EAT_NATIVE_GAMEPAD_EVENTS =
         20, //< Used to tell the runtime not to eat gamepad events.  If this is false on a native
     // app, the app must be listening for the events.
@@ -323,8 +312,7 @@ typedef enum ovrSystemStatus_ {
     
     VRAPI_SYS_STATUS_FRONT_BUFFER_PROTECTED =
         128, //< VRAPI_TRUE if the front buffer is allocated in TrustZone memory.
-    VRAPI_SYS_STATUS_FRONT_BUFFER_565 = 129, //< VRAPI_TRUE if the front buffer is 16-bit 5:6:5
-    VRAPI_SYS_STATUS_FRONT_BUFFER_SRGB =
+        VRAPI_SYS_STATUS_FRONT_BUFFER_SRGB =
         130, //< VRAPI_TRUE if the front buffer uses the sRGB color space.
 
     VRAPI_SYS_STATUS_SCREEN_CAPTURE_RUNNING =
@@ -408,11 +396,7 @@ typedef enum ovrModeFlags_ {
     /// requires the WindowSurface to be allocated from TimeWarp, via
     /// specifying the nativeWindow via VRAPI_MODE_FLAG_NATIVE_WINDOW.
     VRAPI_MODE_FLAG_FRONT_BUFFER_PROTECTED = 0x00020000,
-
-    /// Create a 16-bit 5:6:5 front buffer.
-    VRAPI_MODE_FLAG_FRONT_BUFFER_565 = 0x00040000,
-
-    /// Create a front buffer using the sRGB color space.
+        /// Create a front buffer using the sRGB color space.
     VRAPI_MODE_FLAG_FRONT_BUFFER_SRGB = 0x00080000,
 
     /// If set, indicates the OpenGL ES Context was created with EGL_CONTEXT_OPENGL_NO_ERROR_KHR
@@ -443,9 +427,9 @@ typedef struct ovrModeParms_ {
     /// Using EGL this is an EGLDisplay.
     unsigned long long Display;
 
-    /// The window surface to use for asynchronous time warp rendering.
-    /// Using EGL this can be the EGLSurface created by the application for the ANativeWindow.
-    /// This should be the ANativeWIndow itself (requires VRAPI_MODE_FLAG_NATIVE_WINDOW).
+    /// The ANativeWIndow associated with the application's Surface (requires
+    /// VRAPI_MODE_FLAG_NATIVE_WINDOW). The ANativeWIndow is used for asynchronous time warp
+    /// rendering.
     unsigned long long WindowSurface;
 
     /// The resources from this context will be shared with the asynchronous time warp.
@@ -616,6 +600,54 @@ typedef enum ovrDefaultTextureSwapChain_ {
 } ovrDefaultTextureSwapChain;
 
 typedef struct ovrTextureSwapChain ovrTextureSwapChain;
+
+typedef enum ovrSwapChainCreateFlags_ {
+    /// Image is in subsampled layout.
+    VRAPI_SWAPCHAIN_CREATE_SUBSAMPLED_BIT = 0x1,
+} ovrSwapChainCreateFlags;
+
+typedef enum ovrSwapChainUsageFlags_ {
+    /// Image may be a color rendering target.
+    VRAPI_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT = 0x1,
+
+    /// Image may be a depth/stencil rendering target.
+    VRAPI_SWAPCHAIN_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT = 0x2,
+} ovrSwapChainUsageFlags;
+
+typedef struct ovrSwapChainCreateInfo_ {
+    /// GL/Vulkan format of the texture, e.g. GL_RGBA or VK_FORMAT_R8G8B8A8_UNORM),
+    /// depending on GraphicsAPI used.
+    int64_t Format;
+
+    /// Width in pixels.
+    int Width;
+
+    /// Height in pixels.
+    int Height;
+
+    /// The number of levels of detail available for minified sampling of the image.
+    int Levels;
+
+    /// Number of faces, which can be either 6 (for cubemaps) or 1.
+    int FaceCount;
+
+    /// Number of array layers, 1 for 2D texture, 2 for texture 2D array (multiview case).
+    int ArraySize;
+
+    /// Number of buffers in the texture swap chain.
+    int BufferCount;
+
+    /// A bitmask of ovrSwapChainCreateFlags describing additional properties of
+    /// the swapchain.
+    uint64_t CreateFlags;
+
+    /// A bitmask of ovrSwapChainUsageFlags describing intended usage of the
+    /// swapchain's images.
+    uint64_t UsageFlags;
+} ovrSwapChainCreateInfo;
+
+OVR_VRAPI_ASSERT_TYPE_SIZE_32_BIT(ovrSwapChainCreateInfo, 48);
+OVR_VRAPI_ASSERT_TYPE_SIZE_64_BIT(ovrSwapChainCreateInfo, 48);
 
 //-----------------------------------------------------------------
 // Frame Submission
@@ -836,12 +868,12 @@ typedef struct ovrFrameParms_ {
     /// Latency Mode.
     ovrExtraLatencyMode ExtraLatencyMode;
 
-            /// \unused parameter.
-        ovrMatrix4f Reserved;
-        
-            /// \unused parameter.
-        void* Reserved1;
-        
+        /// \unused parameter.
+    ovrMatrix4f Reserved;
+
+        /// \unused parameter.
+    void* Reserved1;
+
     /// CPU/GPU performance parameters.
     ovrPerformanceParms PerformanceParms;
 
@@ -877,9 +909,9 @@ typedef struct ovrLayerHeader2_ {
     ovrVector4f ColorScale;
     ovrFrameLayerBlend SrcBlend;
     ovrFrameLayerBlend DstBlend;
-            /// \unused parameter.
-        void* Reserved;
-        } ovrLayerHeader2;
+        /// \unused parameter.
+    void* Reserved;
+} ovrLayerHeader2;
 
 OVR_VRAPI_ASSERT_TYPE_SIZE_32_BIT(ovrLayerHeader2, 36);
 OVR_VRAPI_ASSERT_TYPE_SIZE_64_BIT(ovrLayerHeader2, 40);
@@ -1297,7 +1329,7 @@ typedef enum ovrEventType_ {
     // The current activity is in the background (but possibly still visible) and has lost input
     // focus.
     VRAPI_EVENT_FOCUS_LOST = 5,
-    } ovrEventType;
+        } ovrEventType;
 
 typedef struct ovrEventHeader_ {
     ovrEventType EventType;
@@ -1327,6 +1359,7 @@ typedef struct ovrEventFocusGained_ {
 typedef struct ovrEventFocusLost_ {
     ovrEventHeader EventHeader;
 } ovrEventFocusLost;
+
 
 
 typedef struct ovrEventDataBuffer_ {
