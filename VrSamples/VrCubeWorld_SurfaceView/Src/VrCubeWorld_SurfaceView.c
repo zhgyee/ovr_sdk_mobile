@@ -284,21 +284,22 @@ static void ovrEgl_CreateContext(ovrEgl* egl, const ovrEgl* shareEgl) {
         ALOGE("        eglGetConfigs() failed: %s", EglErrorString(eglGetError()));
         return;
     }
-    const EGLint configAttribs[] = {EGL_RED_SIZE,
-                                    8,
-                                    EGL_GREEN_SIZE,
-                                    8,
-                                    EGL_BLUE_SIZE,
-                                    8,
-                                    EGL_ALPHA_SIZE,
-                                    8, // need alpha for the multi-pass timewarp compositor
-                                    EGL_DEPTH_SIZE,
-                                    0,
-                                    EGL_STENCIL_SIZE,
-                                    0,
-                                    EGL_SAMPLES,
-                                    0,
-                                    EGL_NONE};
+    const EGLint configAttribs[] = {
+        EGL_RED_SIZE,
+        8,
+        EGL_GREEN_SIZE,
+        8,
+        EGL_BLUE_SIZE,
+        8,
+        EGL_ALPHA_SIZE,
+        8, // need alpha for the multi-pass timewarp compositor
+        EGL_DEPTH_SIZE,
+        0,
+        EGL_STENCIL_SIZE,
+        0,
+        EGL_SAMPLES,
+        0,
+        EGL_NONE};
     egl->Config = 0;
     for (int i = 0; i < numConfigs; i++) {
         EGLint value = 0;

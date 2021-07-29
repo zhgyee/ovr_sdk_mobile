@@ -123,6 +123,13 @@ while (!exit) {
 
         // Frame loop, possibly running on another thread.
         for (long long frameIndex = 1; resumed && nativeWindow != NULL; frameIndex++) {
+            // To indicate the start of the frame, we can call vrapi_WaitFrame & vrapi_BeginFrame here,
+            // Those are optional APIs for non Phase-Sync app.
+            // vrapi_WaitFrame can be called in a different thread for each frame.
+            // vrapi_BeginFrame should be called after vrapi_WaitFrame returned.
+            vrapi_WaitFrame(ovr, frameIndex);
+            vrapi_BeginFrame(ovr, frameIndex);
+
             // Get the HMD pose, predicted for the middle of the time period during which
             // the new eye images will be displayed. The number of frames predicted ahead
             // depends on the pipeline depth of the engine and the synthesis rate.
@@ -815,6 +822,44 @@ OVR_VRAPI_EXPORT jobject vrapi_GetTextureSwapChainAndroidSurface(ovrTextureSwapC
 // Frame Submission
 //-----------------------------------------------------------------
 
+/// In order to support PhaseSync, the application must call vrapi_Waitframe and vrapi_BeginFrame
+/// each frame.
+///
+/// * vrapi_WaitFrame marks a new frame's start and automatically adjusts frame start time to reduce
+///   pose prediction latency. In doing so, vrapi_WaitFrame may block the application calling
+///   thread.
+///
+///   For multi-threaded applications, vrapi_WaitFrame is expected to be called from the main
+///   simulation) thread.
+///   For single-threaded applications, vrapi_WaitFrame may be called from the render thread before
+///   calling vrapi_BeginFrame.
+///
+/// * vrapi_BeginFrame  is called prior to the start of frame render and marks a new render frame's
+///   start. Applications must guarantee that vrapi_BeginFrame is only called after a corresponding
+///   call to vrapi_WaitFrame has completed, vrapi_BeginFrame should be called from the same thread
+///   as vrapi_SubmitFrame2
+///
+/// * Correspondingly, vrapi_SubmitFrame2 should be called from the same thread as vrapi_BeginFrame
+///   (render thread), as it indicates the render frame's completion.
+///
+/// To visualize the calling orders
+///
+/// For mutli-threaded application
+/// Main Thread     |-W(n)--------|-W(n+1)------|--
+/// Render Thread    ----|B(n)-------S(n)|B(n+1)---S(n+1)|
+///
+/// For single-threaded application
+/// Render Thread    |W(n)B(n)------S(n)|W(n+1)B(n+1)---S(n+1)|
+///
+/// Where W(n) indicates a WaitFrame call for frame index n
+/// Where B(n) indicates a BeginFrame call for frame index n
+/// Where S(n) indicates a SubmitFrame call for frame index n
+
+/// To be optionally called at the start of the main thread.
+OVR_VRAPI_EXPORT ovrResult vrapi_WaitFrame(ovrMobile* ovr, uint64_t frameIndex);
+
+/// To be optionally called at the start of the render thread.
+OVR_VRAPI_EXPORT ovrResult vrapi_BeginFrame(ovrMobile* ovr, uint64_t frameIndex);
 
 /// Accepts new eye images plus poses that will be used for future warps.
 /// The parms are copied, and are not referenced after the function returns.

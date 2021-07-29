@@ -189,7 +189,7 @@ class MemBufferT {
     }
 
     // returns a const pointer to the buffer
-    operator C const*() const {
+    operator C const *() const {
         return Buffer;
     }
 

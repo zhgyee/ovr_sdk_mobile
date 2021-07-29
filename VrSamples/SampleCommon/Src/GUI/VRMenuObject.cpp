@@ -1016,12 +1016,14 @@ void VRMenuObject::Init(OvrGuiSys& guiSys, VRMenuObjectParms const& parms) {
     }
 
     if (parms.TexelCoords) {
-        LocalPose.Translation = {LocalPose.Translation.x * DEFAULT_TEXEL_SCALE,
-                                 LocalPose.Translation.y * DEFAULT_TEXEL_SCALE,
-                                 LocalPose.Translation.z};
-        TextLocalPose.Translation = {TextLocalPose.Translation.x * DEFAULT_TEXEL_SCALE,
-                                     TextLocalPose.Translation.y * DEFAULT_TEXEL_SCALE,
-                                     TextLocalPose.Translation.z};
+        LocalPose.Translation = {
+            LocalPose.Translation.x * DEFAULT_TEXEL_SCALE,
+            LocalPose.Translation.y * DEFAULT_TEXEL_SCALE,
+            LocalPose.Translation.z};
+        TextLocalPose.Translation = {
+            TextLocalPose.Translation.x * DEFAULT_TEXEL_SCALE,
+            TextLocalPose.Translation.y * DEFAULT_TEXEL_SCALE,
+            TextLocalPose.Translation.z};
         if (Surfaces.size() > 0) {
             Vector2f dims = Surfaces[0].GetDims();
             LocalScale = Vector3f(LocalScale.x / dims.x, LocalScale.y / dims.y, LocalScale.z);

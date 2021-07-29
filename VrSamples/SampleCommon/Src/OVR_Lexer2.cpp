@@ -20,6 +20,7 @@ of patent rights can be found in the PATENTS file in the same directory.
 #include <cstdlib> // for strto* functions
 #include <errno.h>
 #include <utility>
+#include <assert.h>
 
 namespace OVRFW {
 

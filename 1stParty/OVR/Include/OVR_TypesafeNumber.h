@@ -60,6 +60,7 @@ class TypesafeNumberT {
     // constructors
     TypesafeNumberT();
     explicit TypesafeNumberT(T const value);
+    TypesafeNumberT(TypesafeNumberT const& value);
 
     // NOTE: the assignmnet of a Type value is implemented with "= delete"
     // to demonstrate that the whole point of this template is to
@@ -124,8 +125,13 @@ inline TypesafeNumberT<T, UniqueType, InitialValue>::TypesafeNumberT(T const val
     : Value(value) {}
 
 template <typename T, typename UniqueType, UniqueType InitialValue>
-inline TypesafeNumberT<T, UniqueType, InitialValue>& TypesafeNumberT<T, UniqueType, InitialValue>::
-operator=(TypesafeNumberT const& rhs) {
+inline TypesafeNumberT<T, UniqueType, InitialValue>::TypesafeNumberT(TypesafeNumberT const& value) {
+    *this = value;
+}
+
+template <typename T, typename UniqueType, UniqueType InitialValue>
+inline TypesafeNumberT<T, UniqueType, InitialValue>&
+TypesafeNumberT<T, UniqueType, InitialValue>::operator=(TypesafeNumberT const& rhs) {
     if (&rhs != this) {
         this->Value = rhs.Value;
     }
@@ -169,15 +175,15 @@ inline bool TypesafeNumberT<T, UniqueType, InitialValue>::operator>=(
 }
 
 template <typename T, typename UniqueType, UniqueType InitialValue>
-inline TypesafeNumberT<T, UniqueType, InitialValue>& TypesafeNumberT<T, UniqueType, InitialValue>::
-operator++() {
+inline TypesafeNumberT<T, UniqueType, InitialValue>&
+TypesafeNumberT<T, UniqueType, InitialValue>::operator++() {
     this->Value++;
     return *this;
 }
 
 template <typename T, typename UniqueType, UniqueType InitialValue>
-inline TypesafeNumberT<T, UniqueType, InitialValue> TypesafeNumberT<T, UniqueType, InitialValue>::
-operator++(int) {
+inline TypesafeNumberT<T, UniqueType, InitialValue>
+TypesafeNumberT<T, UniqueType, InitialValue>::operator++(int) {
     // postfix
     TypesafeNumberT temp(*this);
     operator++();
@@ -185,15 +191,15 @@ operator++(int) {
 }
 
 template <typename T, typename UniqueType, UniqueType InitialValue>
-inline TypesafeNumberT<T, UniqueType, InitialValue>& TypesafeNumberT<T, UniqueType, InitialValue>::
-operator--() {
+inline TypesafeNumberT<T, UniqueType, InitialValue>&
+TypesafeNumberT<T, UniqueType, InitialValue>::operator--() {
     this->Value--;
     return *this;
 }
 
 template <typename T, typename UniqueType, UniqueType InitialValue>
-inline TypesafeNumberT<T, UniqueType, InitialValue> TypesafeNumberT<T, UniqueType, InitialValue>::
-operator--(int) {
+inline TypesafeNumberT<T, UniqueType, InitialValue>
+TypesafeNumberT<T, UniqueType, InitialValue>::operator--(int) {
     // postfix
     TypesafeNumberT temp(*this);
     operator--();
@@ -201,67 +207,67 @@ operator--(int) {
 }
 
 template <typename T, typename UniqueType, UniqueType InitialValue>
-inline TypesafeNumberT<T, UniqueType, InitialValue>& TypesafeNumberT<T, UniqueType, InitialValue>::
-operator+=(TypesafeNumberT const& rhs) {
+inline TypesafeNumberT<T, UniqueType, InitialValue>&
+TypesafeNumberT<T, UniqueType, InitialValue>::operator+=(TypesafeNumberT const& rhs) {
     this->Value = this->Value + rhs.Value;
     return *this;
 }
 
 template <typename T, typename UniqueType, UniqueType InitialValue>
-inline TypesafeNumberT<T, UniqueType, InitialValue>& TypesafeNumberT<T, UniqueType, InitialValue>::
-operator-=(TypesafeNumberT const& rhs) {
+inline TypesafeNumberT<T, UniqueType, InitialValue>&
+TypesafeNumberT<T, UniqueType, InitialValue>::operator-=(TypesafeNumberT const& rhs) {
     this->Value = this->Value - rhs.Value;
     return *this;
 }
 
 template <typename T, typename UniqueType, UniqueType InitialValue>
-inline TypesafeNumberT<T, UniqueType, InitialValue>& TypesafeNumberT<T, UniqueType, InitialValue>::
-operator*=(TypesafeNumberT const& rhs) {
+inline TypesafeNumberT<T, UniqueType, InitialValue>&
+TypesafeNumberT<T, UniqueType, InitialValue>::operator*=(TypesafeNumberT const& rhs) {
     this->Value = this->Value * rhs.Value;
     return *this;
 }
 
 template <typename T, typename UniqueType, UniqueType InitialValue>
-inline TypesafeNumberT<T, UniqueType, InitialValue>& TypesafeNumberT<T, UniqueType, InitialValue>::
-operator/=(TypesafeNumberT const& rhs) {
+inline TypesafeNumberT<T, UniqueType, InitialValue>&
+TypesafeNumberT<T, UniqueType, InitialValue>::operator/=(TypesafeNumberT const& rhs) {
     this->Value = this->Value / rhs.Value;
     return *this;
 }
 
 template <typename T, typename UniqueType, UniqueType InitialValue>
-inline TypesafeNumberT<T, UniqueType, InitialValue>& TypesafeNumberT<T, UniqueType, InitialValue>::
-operator%=(TypesafeNumberT const& rhs) {
+inline TypesafeNumberT<T, UniqueType, InitialValue>&
+TypesafeNumberT<T, UniqueType, InitialValue>::operator%=(TypesafeNumberT const& rhs) {
     this->Value = this->Value % rhs.Value;
     return *this;
 }
 
 template <typename T, typename UniqueType, UniqueType InitialValue>
-inline TypesafeNumberT<T, UniqueType, InitialValue> TypesafeNumberT<T, UniqueType, InitialValue>::
-operator+(TypesafeNumberT const& rhs) const {
+inline TypesafeNumberT<T, UniqueType, InitialValue>
+TypesafeNumberT<T, UniqueType, InitialValue>::operator+(TypesafeNumberT const& rhs) const {
     return TypesafeNumberT(this->Value + rhs.Value);
 }
 
 template <typename T, typename UniqueType, UniqueType InitialValue>
-inline TypesafeNumberT<T, UniqueType, InitialValue> TypesafeNumberT<T, UniqueType, InitialValue>::
-operator-(TypesafeNumberT const& rhs) const {
+inline TypesafeNumberT<T, UniqueType, InitialValue>
+TypesafeNumberT<T, UniqueType, InitialValue>::operator-(TypesafeNumberT const& rhs) const {
     return TypesafeNumberT(this->Value - rhs.Value);
 }
 
 template <typename T, typename UniqueType, UniqueType InitialValue>
-inline TypesafeNumberT<T, UniqueType, InitialValue> TypesafeNumberT<T, UniqueType, InitialValue>::
-operator*(TypesafeNumberT const& rhs) const {
+inline TypesafeNumberT<T, UniqueType, InitialValue>
+TypesafeNumberT<T, UniqueType, InitialValue>::operator*(TypesafeNumberT const& rhs) const {
     return TypesafeNumberT(this->Value * rhs.Value);
 }
 
 template <typename T, typename UniqueType, UniqueType InitialValue>
-inline TypesafeNumberT<T, UniqueType, InitialValue> TypesafeNumberT<T, UniqueType, InitialValue>::
-operator/(TypesafeNumberT const& rhs) const {
+inline TypesafeNumberT<T, UniqueType, InitialValue>
+TypesafeNumberT<T, UniqueType, InitialValue>::operator/(TypesafeNumberT const& rhs) const {
     return TypesafeNumberT(this->Value / rhs.Value);
 }
 
 template <typename T, typename UniqueType, UniqueType InitialValue>
-inline TypesafeNumberT<T, UniqueType, InitialValue> TypesafeNumberT<T, UniqueType, InitialValue>::
-operator%(TypesafeNumberT const& rhs) const {
+inline TypesafeNumberT<T, UniqueType, InitialValue>
+TypesafeNumberT<T, UniqueType, InitialValue>::operator%(TypesafeNumberT const& rhs) const {
     return TypesafeNumberT(this->Value % rhs.Value);
 }
 

@@ -46,13 +46,12 @@ OVR_VRAPI_ASSERT_TYPE_SIZE_64_BIT(ovrJava, 24);
 // Basic Types
 //-----------------------------------------------------------------
 
+// All return codes for VrApi are reported via ovrResult.
+// Possible return codes are split between successful completion
+// codes (ovrSuccessResult) which are all positive values and
+// error codes (ovrErrorResult) which are all negative values).
 typedef signed int ovrResult;
 
-/// ovrResult isn't actually an enum type and the the success / failure types are not
-/// defined anywhere for GearVR VrApi. This needs to be remedied. For now, I'm defining
-/// these here and will try to address this larger issue in a follow-on changeset.
-/// errors are < 0, successes are >= 0
-/// Except where noted, these match error codes from PC CAPI.
 typedef enum ovrSuccessResult_ {
     ovrSuccess = 0,
     ovrSuccess_BoundaryInvalid = 1001,
@@ -386,6 +385,12 @@ typedef enum ovrModeFlags_ {
     VRAPI_MODE_FLAG_CREATE_CONTEXT_NO_ERROR = 0x00100000,
 
     
+    /// The flag will enable phase sync mode for the app, which can manage app's prediction latency
+    /// adaptively, so when app's workload is low, the prediction latency will be low as well
+    /// Note: this mode is only working with vrapi_WaitFrame / vrapi_BeginFrame / vrapi_SubmitFrame
+    /// call pattern. If an app only uses vrapi_SubmitFrame, the mode can't be enabled.
+    VRAPI_MODE_FLAG_PHASE_SYNC = 0x00400000,
+
 } ovrModeFlags;
 
 /// Configuration details that stay constant between a vrapi_EnterVrMode()/vrapi_LeaveVrMode() pair.

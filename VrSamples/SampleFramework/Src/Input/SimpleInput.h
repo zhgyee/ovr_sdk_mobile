@@ -147,6 +147,9 @@ class SimpleInput {
     bool IsPaused() const {
         return isPaused_;
     }
+    bool IsAtEnd() const {
+        return currentFrame_ == static_cast<int>(recordedFrames_.size() - 1);
+    }
     int CurrentFrame() const {
         return currentFrame_;
     }

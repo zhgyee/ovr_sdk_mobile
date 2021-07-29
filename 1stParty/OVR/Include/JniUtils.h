@@ -92,7 +92,7 @@ inline jint ovr_DetachCurrentThread(JavaVM* vm) {
 //==============================================================
 class TempJniEnv {
    public:
-    TempJniEnv(JavaVM* vm_, const char* file = "<unspecified>", int line = -1)
+    TempJniEnv(JavaVM* vm_, const char* /*file*/ = "<unspecified>", int /*line*/ = -1)
         : Vm(vm_), Jni(NULL), PrivateEnv(false) {
         if (JNI_OK != Vm->GetEnv(reinterpret_cast<void**>(&Jni), JNI_VERSION_1_6)) {
             OVR_LOG(
@@ -277,7 +277,7 @@ class JavaUTFChars : public JavaString {
     char const* ToStr() const {
         return UTFString;
     }
-    operator char const*() const {
+    operator char const *() const {
         return UTFString;
     }
 

@@ -10,6 +10,8 @@ Copyright   :   Copyright (c) Facebook Technologies, LLC and its affiliates. All
 ************************************************************************************/
 
 #include "PointList.h"
+#include <assert.h>
+
 using OVR::Vector3f;
 
 namespace OVRFW {

@@ -876,9 +876,10 @@ static inline float vrapi_GetInterpupillaryDistance(const ovrTracking2* tracking
     const ovrMatrix4f leftPose =
         ovrMatrix4f_Inverse(&tracking2->Eye[0].ViewMatrix); // convert to world
     const ovrMatrix4f rightPose = ovrMatrix4f_Inverse(&tracking2->Eye[1].ViewMatrix);
-    const ovrVector3f delta = {rightPose.M[0][3] - leftPose.M[0][3],
-                               rightPose.M[1][3] - leftPose.M[1][3],
-                               rightPose.M[2][3] - leftPose.M[2][3]};
+    const ovrVector3f delta = {
+        rightPose.M[0][3] - leftPose.M[0][3],
+        rightPose.M[1][3] - leftPose.M[1][3],
+        rightPose.M[2][3] - leftPose.M[2][3]};
     return sqrtf(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z);
 }
 

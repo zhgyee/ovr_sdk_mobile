@@ -123,16 +123,7 @@ bool ovrVkInstance_Create(
 #endif
 
     // TODO: Differentiate between required and validation/debug.
-    static const char* requestedLayers[] = {
-        "VK_LAYER_LUNARG_core_validation",
-        "VK_LAYER_LUNARG_parameter_validation",
-        "VK_LAYER_LUNARG_object_tracker",
-        "VK_LAYER_GOOGLE_threading",
-        "VK_LAYER_GOOGLE_unique_objects"
-#if USE_API_DUMP == 1
-        "VK_LAYER_LUNARG_api_dump",
-#endif
-    };
+    static const char* requestedLayers[] = {"VK_LAYER_KHRONOS_validation"};
     const uint32_t requestedCount = sizeof(requestedLayers) / sizeof(requestedLayers[0]);
 
     // Request debug layers
@@ -159,7 +150,7 @@ bool ovrVkInstance_Create(
     }
 
 #if defined(_DEBUG)
-    ALOV("Enabled Layers ");
+    ALOGV("Enabled Layers ");
     for (uint32_t i = 0; i < enabledLayerCount; i++) {
         ALOGV("\t(%d):%s", i, enabledLayerNames[i]);
     }
@@ -331,16 +322,7 @@ bool ovrVkDevice_SelectPhysicalDevice(
 #endif
 
     // TODO: Differentiate between required and validation/debug.
-    static const char* requestedLayers[] = {
-        "VK_LAYER_LUNARG_core_validation",
-        "VK_LAYER_LUNARG_parameter_validation",
-        "VK_LAYER_LUNARG_object_tracker",
-        "VK_LAYER_GOOGLE_threading",
-        "VK_LAYER_GOOGLE_unique_objects"
-#if USE_API_DUMP == 1
-        "VK_LAYER_LUNARG_api_dump",
-#endif
-    };
+    static const char* requestedLayers[] = {"VK_LAYER_KHRONOS_validation"};
     const int requestedCount = sizeof(requestedLayers) / sizeof(requestedLayers[0]);
 
     device->enabledLayerCount = 0;
@@ -505,7 +487,7 @@ bool ovrVkDevice_SelectPhysicalDevice(
             free(availableLayers);
 
 #if defined(_DEBUG)
-            ALOV("Enabled Layers ");
+            ALOGV("Enabled Layers ");
             for (uint32_t i = 0; i < device->enabledLayerCount; i++) {
                 ALOGV("\t(%d):%s", i, device->enabledLayerNames[i]);
             }
@@ -2155,26 +2137,27 @@ static VkDescriptorType ovrGpuProgramParm_GetDescriptorType(const ovrVkProgramPa
 }
 
 int ovrVkProgramParm_GetPushConstantSize(ovrVkProgramParmType type) {
-    static const int parmSize[OVR_PROGRAM_PARM_TYPE_MAX] = {(unsigned int)0,
-                                                            (unsigned int)0,
-                                                            (unsigned int)0,
-                                                            (unsigned int)sizeof(int),
-                                                            (unsigned int)sizeof(int[2]),
-                                                            (unsigned int)sizeof(int[3]),
-                                                            (unsigned int)sizeof(int[4]),
-                                                            (unsigned int)sizeof(float),
-                                                            (unsigned int)sizeof(float[2]),
-                                                            (unsigned int)sizeof(float[3]),
-                                                            (unsigned int)sizeof(float[4]),
-                                                            (unsigned int)sizeof(float[2][2]),
-                                                            (unsigned int)sizeof(float[2][3]),
-                                                            (unsigned int)sizeof(float[2][4]),
-                                                            (unsigned int)sizeof(float[3][2]),
-                                                            (unsigned int)sizeof(float[3][3]),
-                                                            (unsigned int)sizeof(float[3][4]),
-                                                            (unsigned int)sizeof(float[4][2]),
-                                                            (unsigned int)sizeof(float[4][3]),
-                                                            (unsigned int)sizeof(float[4][4])};
+    static const int parmSize[OVR_PROGRAM_PARM_TYPE_MAX] = {
+        (unsigned int)0,
+        (unsigned int)0,
+        (unsigned int)0,
+        (unsigned int)sizeof(int),
+        (unsigned int)sizeof(int[2]),
+        (unsigned int)sizeof(int[3]),
+        (unsigned int)sizeof(int[4]),
+        (unsigned int)sizeof(float),
+        (unsigned int)sizeof(float[2]),
+        (unsigned int)sizeof(float[3]),
+        (unsigned int)sizeof(float[4]),
+        (unsigned int)sizeof(float[2][2]),
+        (unsigned int)sizeof(float[2][3]),
+        (unsigned int)sizeof(float[2][4]),
+        (unsigned int)sizeof(float[3][2]),
+        (unsigned int)sizeof(float[3][3]),
+        (unsigned int)sizeof(float[3][4]),
+        (unsigned int)sizeof(float[4][2]),
+        (unsigned int)sizeof(float[4][3]),
+        (unsigned int)sizeof(float[4][4])};
     assert((sizeof(parmSize) / sizeof(parmSize[0])) == OVR_PROGRAM_PARM_TYPE_MAX);
     return parmSize[type];
 }

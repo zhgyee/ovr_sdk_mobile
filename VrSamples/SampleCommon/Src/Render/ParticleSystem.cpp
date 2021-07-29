@@ -63,10 +63,11 @@ void main()
 }
 )glsl";
 
-static Vector3f quadVertPos[4] = {{-0.5f, 0.5f, 0.0f},
-                                  {0.5f, 0.5f, 0.0f},
-                                  {0.5f, -0.5f, 0.0f},
-                                  {-0.5f, -0.5f, 0.0f}};
+static Vector3f quadVertPos[4] = {
+    {-0.5f, 0.5f, 0.0f},
+    {0.5f, 0.5f, 0.0f},
+    {0.5f, -0.5f, 0.0f},
+    {-0.5f, -0.5f, 0.0f}};
 
 static Vector2f quadUVs[4] = {{0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}};
 

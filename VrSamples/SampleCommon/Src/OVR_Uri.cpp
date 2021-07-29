@@ -13,6 +13,7 @@ Copyright   :   Copyright (c) Facebook Technologies, LLC and its affiliates. All
 #include <cctype>
 #include "Misc/Log.h"
 #include "OVR_UTF8Util.h"
+#include <assert.h>
 
 // If enabled, allow URI's missing a scheme to be considered valid. This is valuable
 // if we want to allow for old paths to work by defaulting the scheme.
@@ -223,8 +224,8 @@ bool ovrUri::ParseUri(
                 if (outScheme != NULL) {
                     outScheme[0] = '\0';
                 }
-#if defined( \
-    TOLERATE_MISSING_SCHEME) // tolerant to missing scheme, but not clear if that's desirable
+#if defined(TOLERATE_MISSING_SCHEME) // tolerant to missing scheme, but not clear if that's
+                                     // desirable
                 // try parsing as a host
                 decoder.Reset();
                 break;
@@ -257,8 +258,8 @@ bool ovrUri::ParseUri(
 
             if (schemeOffset == 0) {
                 if (ch == '/') {
-#if defined( \
-    TOLERATE_MISSING_SCHEME) // tolerant to missing scheme, but not clear if that's desirable
+#if defined(TOLERATE_MISSING_SCHEME) // tolerant to missing scheme, but not clear if that's
+                                     // desirable
                     // this may be the start of a path or host
                     // go back to the start of the string and continue parsing as if it were a host
                     decoder.Reset();

@@ -400,9 +400,9 @@ uint64_t FrameIndexToPrint = 0;
 const float kHapticsGripThreashold = 0.1f;
 
 // Matrix to get from tracking pose to the OpenXR compatible 'grip' pose
-static const OVR::Matrix4f xfTrackedFromBinding =
-    OVR::Matrix4f(OVR::Posef{OVR::Quatf{OVR::Vector3f{1, 0, 0}, OVR::DegreeToRad(60.0f)},
-                             OVR::Vector3f{0, -0.03, 0.04}});
+static const OVR::Matrix4f xfTrackedFromBinding = OVR::Matrix4f(OVR::Posef{
+    OVR::Quatf{OVR::Vector3f{1, 0, 0}, OVR::DegreeToRad(60.0f)},
+    OVR::Vector3f{0, -0.03, 0.04}});
 static const OVR::Matrix4f xfTrackedFromBindingInv = xfTrackedFromBinding.Inverted();
 static const OVR::Matrix4f xfPointerFromBinding =
     OVR::Matrix4f::Translation(OVR::Vector3(0.0f, 0.0f, -0.055f));
@@ -1776,6 +1776,7 @@ ovrInputDeviceTrackedRemoteHand* ovrInputDeviceTrackedRemoteHand::Create(
 
     ovrInputStateTrackedRemote remoteInputState;
     remoteInputState.Header.ControllerType = remoteCapabilities.Header.Type;
+    remoteInputState.Header.TimeInSeconds = 0.0f;
     ovrResult result = vrapi_GetCurrentInputState(
         app.GetSessionObject(), remoteCapabilities.Header.DeviceID, &remoteInputState.Header);
     if (result == ovrSuccess) {
@@ -1816,6 +1817,7 @@ bool ovrInputDeviceTrackedRemoteHand::Update(
 
         ovrInputStateTrackedRemote remoteInputState;
         remoteInputState.Header.ControllerType = GetType();
+        remoteInputState.Header.TimeInSeconds = 0.0f;
         ovrResult r = vrapi_GetCurrentInputState(ovr, GetDeviceID(), &remoteInputState.Header);
         if (r == ovrSuccess) {
             IsPinchingInternal = remoteInputState.IndexTrigger > 0.99f;
@@ -1870,8 +1872,8 @@ void ovrInputDeviceTrackedRemoteHand::SetControllerModel(ModelFile* m) {
 void ovrInputDeviceTrackedRemoteHand::UpdateHapticRequestedState(
     const ovrInputStateTrackedRemote& remoteInputState) {
     if (remoteInputState.IndexTrigger > kHapticsGripThreashold) {
-        RequestedHapticState = {SampleConfiguration.OnTriggerHapticsState,
-                                remoteInputState.IndexTrigger};
+        RequestedHapticState = {
+            SampleConfiguration.OnTriggerHapticsState, remoteInputState.IndexTrigger};
     } else {
         RequestedHapticState = {};
     }
@@ -1924,6 +1926,7 @@ bool ovrInputDeviceTrackedHand::Update(
     if (ret) {
         ovrResult r = ovrSuccess;
         InputStateHand.Header.ControllerType = GetType();
+        InputStateHand.Header.TimeInSeconds = 0.0f;
         r = vrapi_GetCurrentInputState(ovr, GetDeviceID(), &InputStateHand.Header);
         if (r != ovrSuccess) {
             ALOG("VrInputStandard - failed to get hand input state.");
@@ -1973,6 +1976,7 @@ ovrInputDeviceStandardPointer* ovrInputDeviceStandardPointer::Create(
 
     ovrInputStateStandardPointer inputState;
     inputState.Header.ControllerType = capsHeader.Header.Type;
+    inputState.Header.TimeInSeconds = 0.0f;
 
     ovrResult result = vrapi_GetCurrentInputState(
         app.GetSessionObject(), capsHeader.Header.DeviceID, &inputState.Header);
@@ -2025,8 +2029,8 @@ void ovrInputDeviceStandardPointer::ResetHaptics(ovrMobile* ovr, float displayTi
 void ovrInputDeviceStandardPointer::UpdateHapticRequestedState(
     const ovrInputStateStandardPointer& inputState) {
     if (inputState.PointerStrength > kHapticsGripThreashold) {
-        RequestedHapticState = {SampleConfiguration.OnTriggerHapticsState,
-                                inputState.PointerStrength};
+        RequestedHapticState = {
+            SampleConfiguration.OnTriggerHapticsState, inputState.PointerStrength};
     } else {
         RequestedHapticState = {};
     }

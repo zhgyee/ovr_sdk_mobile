@@ -45,10 +45,11 @@ inline Vector3f GetViewMatrixForward(Matrix4f const& m) {
 
 namespace OVRFW {
 
-char const* VRMenu::MenuStateNames[MENUSTATE_MAX] = {"MENUSTATE_OPENING",
-                                                     "MENUSTATE_OPEN",
-                                                     "MENUSTATE_CLOSING",
-                                                     "MENUSTATE_CLOSED"};
+char const* VRMenu::MenuStateNames[MENUSTATE_MAX] = {
+    "MENUSTATE_OPENING",
+    "MENUSTATE_OPEN",
+    "MENUSTATE_CLOSING",
+    "MENUSTATE_CLOSED"};
 
 // singleton so that other ids initialized during static initialization can be based off tis
 VRMenuId_t VRMenu::GetRootId() {

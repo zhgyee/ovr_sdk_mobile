@@ -283,21 +283,22 @@ static void ovrEgl_CreateContext(ovrEgl* egl, const ovrEgl* shareEgl) {
         ALOGE("        eglGetConfigs() failed: %s", EglErrorString(eglGetError()));
         return;
     }
-    const EGLint configAttribs[] = {EGL_RED_SIZE,
-                                    8,
-                                    EGL_GREEN_SIZE,
-                                    8,
-                                    EGL_BLUE_SIZE,
-                                    8,
-                                    EGL_ALPHA_SIZE,
-                                    8, // need alpha for the multi-pass timewarp compositor
-                                    EGL_DEPTH_SIZE,
-                                    0,
-                                    EGL_STENCIL_SIZE,
-                                    0,
-                                    EGL_SAMPLES,
-                                    0,
-                                    EGL_NONE};
+    const EGLint configAttribs[] = {
+        EGL_RED_SIZE,
+        8,
+        EGL_GREEN_SIZE,
+        8,
+        EGL_BLUE_SIZE,
+        8,
+        EGL_ALPHA_SIZE,
+        8, // need alpha for the multi-pass timewarp compositor
+        EGL_DEPTH_SIZE,
+        0,
+        EGL_STENCIL_SIZE,
+        0,
+        EGL_SAMPLES,
+        0,
+        EGL_NONE};
     egl->Config = 0;
     for (int i = 0; i < numConfigs; i++) {
         EGLint value = 0;
@@ -1226,18 +1227,19 @@ ovrTextureSwapChain* ovrTextureSwapChain_CreateFromKTX(const char* fileName) {
         return NULL;
     }
 
-    const unsigned char fileIdentifier[12] = {(unsigned char)'\xAB',
-                                              'K',
-                                              'T',
-                                              'X',
-                                              ' ',
-                                              '1',
-                                              '1',
-                                              (unsigned char)'\xBB',
-                                              '\r',
-                                              '\n',
-                                              '\x1A',
-                                              '\n'};
+    const unsigned char fileIdentifier[12] = {
+        (unsigned char)'\xAB',
+        'K',
+        'T',
+        'X',
+        ' ',
+        '1',
+        '1',
+        (unsigned char)'\xBB',
+        '\r',
+        '\n',
+        '\x1A',
+        '\n'};
 
     const GlHeaderKTX_t* header = (GlHeaderKTX_t*)buffer;
     if (memcmp(header->identifier, fileIdentifier, sizeof(fileIdentifier)) != 0) {

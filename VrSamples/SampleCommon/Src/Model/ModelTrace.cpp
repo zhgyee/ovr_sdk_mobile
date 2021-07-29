@@ -14,6 +14,7 @@ Copyright   :   Copyright (c) Facebook Technologies, LLC and its affiliates. All
 #include <math.h>
 #include <algorithm>
 #include <vector>
+#include <assert.h>
 
 #include "Misc/Log.h"
 

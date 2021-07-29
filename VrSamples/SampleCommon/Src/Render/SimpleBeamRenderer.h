@@ -27,7 +27,7 @@ class SimpleBeamRenderer {
         const char* particleTexture,
         OVR::Vector4f particleColor,
         float scale = 1.0f) {
-        PointerParticleColor_ = particleColor;
+        PointerParticleColor = particleColor;
         Scale = scale;
         beamRenderer_.Init(256, true);
 
@@ -60,8 +60,8 @@ class SimpleBeamRenderer {
 
         // Add UI pointers to render
         for (auto& device : hitTestDevices) {
-            const auto& beam = beamRenderer_.AddBeam(
-                in, 0.03f, device.pointerStart, device.pointerEnd, {0.5f, 0.8f, 1.0f, 1.0f});
+            const auto& beam =
+                beamRenderer_.AddBeam(in, 0.03f, device.pointerStart, device.pointerEnd, BeamColor);
             beams_.push_back(beam);
 
             // if (LaserHit)
@@ -71,7 +71,7 @@ class SimpleBeamRenderer {
                 0.0f,
                 OVR::Vector3f(0.0f),
                 OVR::Vector3f(0.0f),
-                PointerParticleColor_,
+                PointerParticleColor,
                 ovrEaseFunc::NONE,
                 0.0f,
                 0.1f * Scale,
@@ -83,20 +83,18 @@ class SimpleBeamRenderer {
     void Render(const OVRFW::ovrApplFrameIn& in, OVRFW::ovrRendererOutput& out) {
         /// Render beams
         const OVR::Matrix4f projectionMatrix;
-        beamRenderer_.Frame(in, out.FrameMatrices.CenterView);
-        beamRenderer_.Render(out.Surfaces);
         particleSystem_.Frame(in, spriteAtlas_, out.FrameMatrices.CenterView);
         particleSystem_.RenderEyeView(out.FrameMatrices.CenterView, projectionMatrix, out.Surfaces);
+        beamRenderer_.Frame(in, out.FrameMatrices.CenterView);
+        beamRenderer_.Render(out.Surfaces);
     }
 
    public:
-    // OVR::Vector3f SpecularLightDirection;
-    // OVR::Vector3f SpecularLightColor;
-    // OVR::Vector3f AmbientLightColor;
+    OVR::Vector4f PointerParticleColor = {0.5f, 0.8f, 1.0f, 1.0f};
+    OVR::Vector4f BeamColor = {0.5f, 0.8f, 1.0f, 1.0f};
 
    private:
     OVRFW::ovrBeamRenderer beamRenderer_;
-    OVR::Vector4f PointerParticleColor_;
     OVRFW::ovrParticleSystem particleSystem_;
     OVRFW::ovrTextureAtlas* spriteAtlas_ = nullptr;
     std::vector<OVRFW::ovrBeamRenderer::handle_t> beams_;

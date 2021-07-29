@@ -15,6 +15,8 @@ Copyright   :   Copyright (c) Facebook Technologies, LLC and its affiliates. All
 #include "OVR_Math.h"
 #include "Misc/Log.h"
 
+#include <assert.h>
+
 namespace OVRFW {
 
 //======================================================================================

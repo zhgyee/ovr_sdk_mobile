@@ -16,6 +16,7 @@ Copyright   :   Copyright (c) Facebook Technologies, LLC and its affiliates. All
 
 #include <vector>
 #include <sys/stat.h>
+#include <assert.h>
 
 #include <jni.h>
 typedef struct xrJava_ {

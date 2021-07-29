@@ -328,14 +328,15 @@ static bool mmap_open_opaque(const char* fileName, zlib_mmap_opaque& opaque) {
 }
 
 static unzFile open_opaque(zlib_mmap_opaque& zlib_opaque, const char* fileName) {
-    zlib_filefunc_def zlib_file_funcs = {mmap_fopen_file_func,
-                                         mmap_fread_file_func,
-                                         mmap_fwrite_file_func,
-                                         mmap_ftell_file_func,
-                                         mmap_fseek_file_func,
-                                         mmap_fclose_file_func,
-                                         mmap_ferror_file_func,
-                                         &zlib_opaque};
+    zlib_filefunc_def zlib_file_funcs = {
+        mmap_fopen_file_func,
+        mmap_fread_file_func,
+        mmap_fwrite_file_func,
+        mmap_ftell_file_func,
+        mmap_fseek_file_func,
+        mmap_fclose_file_func,
+        mmap_ferror_file_func,
+        &zlib_opaque};
 
     return unzOpen2(fileName, &zlib_file_funcs);
 }

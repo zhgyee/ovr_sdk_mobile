@@ -1658,7 +1658,7 @@ class Quat {
     }
     // from basis vectors
     static Quat
-    FromBasisVectors(const Vector3<T>& fwd, const Vector3<T>& right, const Vector3<T>& up) {
+    FromBasisVectors(const Vector3<T>& fwd, const Vector3<T>& right, const Vector3<T>& /*up*/) {
         const T dot = fwd.Dot(Vector3<T>((T)0, (T)0, (T)-1));
         const RotateDirection dir =
             right.Dot(Vector3<T>((T)0, (T)0, (T)-1)) < (T)0 ? Rotate_CCW : Rotate_CW;
@@ -2360,6 +2360,14 @@ class Pose {
             Rotation.Normalize();
     }
 
+    Pose& operator=(Pose const& rhs) {
+        if (&rhs != this) {
+            this->Rotation = rhs.Rotation;
+            this->Translation = rhs.Translation;
+        }
+        return *this;
+    }
+
     explicit Pose(const Matrix4<T>& m) : Rotation(m), Translation(m.GetTranslation()) {}
 
     static Pose Identity() {
@@ -2402,13 +2410,14 @@ class Pose {
         "(sizeof(T) == sizeof(double) || sizeof(T) == sizeof(float))");
 
     void ToArray(T* arr) const {
-        T temp[7] = {Rotation.x,
-                     Rotation.y,
-                     Rotation.z,
-                     Rotation.w,
-                     Translation.x,
-                     Translation.y,
-                     Translation.z};
+        T temp[7] = {
+            Rotation.x,
+            Rotation.y,
+            Rotation.z,
+            Rotation.w,
+            Translation.x,
+            Translation.y,
+            Translation.z};
         for (int i = 0; i < 7; i++)
             arr[i] = temp[i];
     }

@@ -1207,15 +1207,16 @@ bool LoadModelFile_glTF_Json(
                                     matrix.M[2][0] * matrix.M[2][0] +
                                     matrix.M[2][1] * matrix.M[2][1] +
                                     matrix.M[2][2] * matrix.M[2][2]);
-                                const float m[9] = {matrix.M[0][0] * rcpScaleX,
-                                                    matrix.M[0][1] * rcpScaleX,
-                                                    matrix.M[0][2] * rcpScaleX,
-                                                    matrix.M[1][0] * rcpScaleY,
-                                                    matrix.M[1][1] * rcpScaleY,
-                                                    matrix.M[1][2] * rcpScaleY,
-                                                    matrix.M[2][0] * rcpScaleZ,
-                                                    matrix.M[2][1] * rcpScaleZ,
-                                                    matrix.M[2][2] * rcpScaleZ};
+                                const float m[9] = {
+                                    matrix.M[0][0] * rcpScaleX,
+                                    matrix.M[0][1] * rcpScaleX,
+                                    matrix.M[0][2] * rcpScaleX,
+                                    matrix.M[1][0] * rcpScaleY,
+                                    matrix.M[1][1] * rcpScaleY,
+                                    matrix.M[1][2] * rcpScaleY,
+                                    matrix.M[2][0] * rcpScaleZ,
+                                    matrix.M[2][1] * rcpScaleZ,
+                                    matrix.M[2][2] * rcpScaleZ};
                                 if (m[0 * 3 + 0] + m[1 * 3 + 1] + m[2 * 3 + 2] > 0.0f) {
                                     float t = +m[0 * 3 + 0] + m[1 * 3 + 1] + m[2 * 3 + 2] + 1.0f;
                                     float s = OVR::RcpSqrt(t) * 0.5f;

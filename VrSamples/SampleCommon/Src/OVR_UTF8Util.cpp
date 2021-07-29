@@ -27,6 +27,7 @@ limitations under the License.
 ************************************************************************************/
 
 #include "OVR_UTF8Util.h"
+#include <assert.h>
 
 namespace OVRFW {
 namespace UTF8Util {
@@ -382,22 +383,23 @@ void log_ucs(const uint32_t* line) {
 int main(int argc, const char* argv[]) {
     {
         const char* test8 = "Ignacio Castaño";
-        const uint32_t test32[] = {0x49,
-                                   0x67,
-                                   0x6E,
-                                   0x61,
-                                   0x63,
-                                   0x69,
-                                   0x6F,
-                                   0x20,
-                                   0x43,
-                                   0x61,
-                                   0x73,
-                                   0x74,
-                                   0x61,
-                                   0xF1,
-                                   0x6F,
-                                   0x00};
+        const uint32_t test32[] = {
+            0x49,
+            0x67,
+            0x6E,
+            0x61,
+            0x63,
+            0x69,
+            0x6F,
+            0x20,
+            0x43,
+            0x61,
+            0x73,
+            0x74,
+            0x61,
+            0xF1,
+            0x6F,
+            0x00};
 
         assert(check_equal(test8, test32));
     }

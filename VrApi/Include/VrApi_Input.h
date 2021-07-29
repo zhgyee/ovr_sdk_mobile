@@ -699,7 +699,6 @@ OVR_VRAPI_EXPORT ovrResult vrapi_SetHapticVibrationBuffer(
     const ovrDeviceID deviceID,
     const ovrHapticBuffer* hapticBuffer);
 
-
 /// Returns the current input state for controllers, without positional tracking info.
 ///
 /// Input: ovr, deviceID, pointer to a capabilities structure (with Type field set)
