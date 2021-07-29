@@ -152,7 +152,6 @@ static const auto NUM_HAPTIC_STATES = 4;
 
 HandSampleConfigurationParameters SampleConfiguration;
 
-
 static const char* OculusTouchVertexShaderSrc = R"glsl(
 attribute highp vec4 Position;
 attribute highp vec3 Normal;
@@ -560,15 +559,15 @@ ovrVrInputStandard::~ovrVrInputStandard() {
 //==============================
 // ovrVrInputStandard::AppInit
 bool ovrVrInputStandard::AppInit(const OVRFW::ovrAppContext* context) {
-    const ovrJava* java = reinterpret_cast<const ovrJava*>(context->ContextForVrApi());
-
-    FileSys = ovrFileSys::Create(*java);
+    const ovrJava& jj = *(reinterpret_cast<const ovrJava*>(context->ContextForVrApi()));
+    const xrJava ctx = JavaContextConvert(jj);
+    FileSys = ovrFileSys::Create(ctx);
     if (nullptr == FileSys) {
         ALOGE("Couldn't create FileSys");
         return false;
     }
 
-    Locale = ovrLocale::Create(*java->Env, java->ActivityObject, "default");
+    Locale = ovrLocale::Create(*ctx.Env, ctx.ActivityObject, "default");
     if (nullptr == Locale) {
         ALOGE("Couldn't create Locale");
         return false;
@@ -587,7 +586,7 @@ bool ovrVrInputStandard::AppInit(const OVRFW::ovrAppContext* context) {
         return false;
     }
 
-    GuiSys = OvrGuiSys::Create(context);
+    GuiSys = OvrGuiSys::Create(&ctx);
     if (nullptr == GuiSys) {
         ALOGE("Couldn't create GUI");
         return false;
@@ -834,7 +833,7 @@ bool ovrVrInputStandard::AppInit(const OVRFW::ovrAppContext* context) {
 
     ParticleSystem = new ovrParticleSystem();
     auto particleGPUstate = ovrParticleSystem::GetDefaultGpuState();
-    ParticleSystem->Init(2048, *SpriteAtlas, particleGPUstate, false);
+    ParticleSystem->Init(2048, SpriteAtlas, particleGPUstate, false);
 
     BeamAtlas = new ovrTextureAtlas();
     BeamAtlas->Init(GuiSys->GetFileSys(), "apk:///assets/beams.ktx");
@@ -960,8 +959,8 @@ void ovrVrInputStandard::RenderRunningFrame(
     OVRFW::ovrRendererOutput& out) {
     // disallow player movement
     ovrApplFrameIn vrFrameWithoutMove = in;
-    vrFrameWithoutMove.LeftRemote.Joystick.x = 0.0f;
-    vrFrameWithoutMove.LeftRemote.Joystick.y = 0.0f;
+    vrFrameWithoutMove.LeftRemoteJoystick.x = 0.0f;
+    vrFrameWithoutMove.LeftRemoteJoystick.y = 0.0f;
 
     bool printPoseNow = false;
     if (FrameIndexToPrint != 0 && FrameIndexToPrint == GetFrameIndex()) {
@@ -1003,12 +1002,6 @@ void ovrVrInputStandard::RenderRunningFrame(
     }
 
     //------------------------------------------------------------------------------------------
-
-    // if the orientation is tracked by the headset, don't allow the gamepad to rotate the view
-    if ((vrFrameWithoutMove.Tracking.Status & VRAPI_TRACKING_STATUS_ORIENTATION_TRACKED) != 0) {
-        vrFrameWithoutMove.RightRemote.Joystick.x = 0.0f;
-        vrFrameWithoutMove.RightRemote.Joystick.y = 0.0f;
-    }
 
     // Force ignoring motion
     vrFrameWithoutMove.LeftRemoteTracked = false;
@@ -1197,7 +1190,7 @@ void ovrVrInputStandard::RenderRunningFrame(
 
     GuiSys->Frame(in, out.FrameMatrices.CenterView, traceMat);
     BeamRenderer->Frame(in, out.FrameMatrices.CenterView, *BeamAtlas);
-    ParticleSystem->Frame(in, *SpriteAtlas, out.FrameMatrices.CenterView);
+    ParticleSystem->Frame(in, SpriteAtlas, out.FrameMatrices.CenterView);
 
     GuiSys->AppendSurfaceList(out.FrameMatrices.CenterView, &out.Surfaces);
 
@@ -1281,13 +1274,13 @@ void ovrVrInputStandard::AppRenderFrame(
 
 void ovrVrInputStandard::SubmitCompositorLayers(const ovrApplFrameIn& in, ovrRendererOutput& out) {
     // set up layers
-    int& layerCount = out.NumLayers;
+    int& layerCount = NumLayers;
     layerCount = 0;
 
     /// Add content layer
-    ovrLayerProjection2& layer = out.Layers[layerCount].Projection;
+    ovrLayerProjection2& layer = Layers[layerCount].Projection;
     layer = vrapi_DefaultLayerProjection2();
-    layer.HeadPose = in.Tracking.HeadPose;
+    layer.HeadPose = Tracking.HeadPose;
     for (int eye = 0; eye < VRAPI_FRAME_LAYER_EYE_MAX; ++eye) {
         ovrFramebuffer* framebuffer = GetFrameBuffer(GetNumFramebuffers() == 1 ? 0 : eye);
         layer.Textures[eye].ColorSwapChain = framebuffer->ColorTextureSwapChain;
@@ -1473,7 +1466,7 @@ void ovrVrInputStandard::OnDeviceConnected(const ovrInputCapabilityHeader& capsH
             }
             break;
         }
-                    case ovrControllerType_StandardPointer: {
+        case ovrControllerType_StandardPointer: {
             ALOG("VrInputStandard - StandardPointer connected, ID = %u", capsHeader.DeviceID);
 
             ovrInputStandardPointerCapabilities pointerCaps;

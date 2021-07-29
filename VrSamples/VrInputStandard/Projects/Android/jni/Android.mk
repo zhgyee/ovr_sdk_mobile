@@ -6,7 +6,8 @@ include ../../../../cflags.mk
 
 LOCAL_MODULE			:= vrinputstandard
 
-LOCAL_C_INCLUDES 		:= 	$(LOCAL_PATH)/../../../../SampleFramework/Src \
+LOCAL_C_INCLUDES 		:= 	$(LOCAL_PATH)/../../../../SampleCommon/Src \
+							$(LOCAL_PATH)/../../../../SampleFramework/Src \
 							$(LOCAL_PATH)/../../../../../VrApi/Include \
 							$(LOCAL_PATH)/../../../../../1stParty/OVR/Include \
 							$(LOCAL_PATH)/../../../../../1stParty/utilities/include \
