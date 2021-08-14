@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 		xmlns:tools="http://schemas.android.com/tools"
 		package="com.oculus.sdk.vrcubeworldfw"
-		android:versionCode="1" 
-		android:versionName="1.0" 
+		android:versionCode="1"
+		android:versionName="1.0"
         android:installLocation="auto"
         tools:ignore="AppLinkUrlError">
 
@@ -23,8 +23,8 @@
 
 	<application android:allowBackup="false" android:label="vrcubeworldfw">
 		<meta-data android:name="com.samsung.android.vr.application.mode" android:value="vr_only"/>
-    <meta-data android:name="com.oculus.supportedDevices" android:value="all" />    
-    
+    <meta-data android:name="com.oculus.supportedDevices" android:value="all" />
+
 		<!-- launchMode is set to singleTask because there should never be multiple copies of the app running -->
 		<!-- Theme.Black.NoTitleBar.Fullscreen gives solid black instead of a (bad stereoscopic) gradient on app transition -->
         <!-- If targeting API level 24+, configChanges should additionally include 'density'. -->

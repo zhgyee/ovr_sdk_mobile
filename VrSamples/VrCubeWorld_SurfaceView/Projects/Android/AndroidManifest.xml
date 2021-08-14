@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 		package="com.oculus.sdk.vrcubeworldsv"
-		android:versionCode="1" 
+		android:versionCode="1"
 		android:versionName="1.0" android:installLocation="auto" >
 
 	<!-- Tell the system this app requires OpenGL ES 3.1. -->
@@ -16,7 +16,7 @@
 
 	<application android:allowBackup="false" android:label="vrcubeworldsv">
 		<meta-data android:name="com.samsung.android.vr.application.mode" android:value="vr_only"/>
-    <meta-data android:name="com.oculus.supportedDevices" android:value="all" />    
+    <meta-data android:name="com.oculus.supportedDevices" android:value="all" />
 		<!-- launchMode is set to singleTask because there should never be multiple copies of the app running -->
 		<!-- Theme.Black.NoTitleBar.Fullscreen gives solid black instead of a (bad stereoscopic) gradient on app transition -->
         <!-- If targeting API level 24+, configChanges should additionally include 'density'. -->
@@ -25,11 +25,11 @@
 				android:name="com.oculus.sdk.vrcubeworldsv.GLES3JNIActivity"
 				android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
 				android:launchMode="singleTask"
-				android:screenOrientation="landscape" 
+				android:screenOrientation="landscape"
 				android:excludeFromRecents="false"
 				android:configChanges="screenSize|screenLayout|orientation|keyboardHidden|keyboard|navigation|uiMode">
       <!-- Indicate the activity is aware of VrApi focus states required for system overlays  -->
-      <meta-data android:name="com.oculus.vr.focusaware" android:value="true"/>      
+      <meta-data android:name="com.oculus.vr.focusaware" android:value="true"/>
       <!-- This filter lets the apk show up as a launchable icon. -->
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />

@@ -600,6 +600,23 @@ static inline ovrPerformanceParms vrapi_DefaultPerformanceParms() {
     return parms;
 }
 
+/// Utility function to specify the default sampler state for a texture swapchain (ie, the sampler
+/// state used at create time).
+static inline ovrTextureSamplerState vrapi_DefaultTextureSamplerState(
+    ovrTextureType type,
+    const int mipCount) {
+    ovrTextureSamplerState state = {};
+    state.MinFilter =
+        (mipCount > 1) ? VRAPI_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR : VRAPI_TEXTURE_FILTER_LINEAR;
+    state.MagFilter = VRAPI_TEXTURE_FILTER_LINEAR;
+    state.WrapModeS = (type != VRAPI_TEXTURE_TYPE_CUBE) ? VRAPI_TEXTURE_WRAP_MODE_CLAMP_TO_EDGE
+                                                        : VRAPI_TEXTURE_WRAP_MODE_REPEAT;
+    state.WrapModeT = (type != VRAPI_TEXTURE_TYPE_CUBE) ? VRAPI_TEXTURE_WRAP_MODE_CLAMP_TO_EDGE
+                                                        : VRAPI_TEXTURE_WRAP_MODE_REPEAT;
+    memset(state.BorderColor, 0, sizeof(state.BorderColor));
+    state.MaxAnisotropy = 1.0f;
+    return state;
+}
 
 //-----------------------------------------------------------------
 // Layer Types - default initialization.
@@ -867,7 +884,6 @@ static inline ovrLayerFishEye2 vrapi_DefaultLayerFishEye2() {
 
 
 
-
 //-----------------------------------------------------------------
 // Eye view matrix helper functions.
 //-----------------------------------------------------------------
@@ -896,9 +912,19 @@ static inline ovrMatrix4f vrapi_GetTransformFromPose(const ovrPosef* pose) {
     return ovrMatrix4f_Multiply(&translation, &rotation);
 }
 
-static inline ovrMatrix4f vrapi_GetViewMatrixFromPose(const ovrPosef* pose) {
-    const ovrMatrix4f transform = vrapi_GetTransformFromPose(pose);
-    return ovrMatrix4f_Inverse(&transform);
+// Compute center-eye from eye view matrices.
+static inline ovrMatrix4f vrapi_GetCenterViewMatrix(
+    const ovrMatrix4f* leftEyeViewMatrix,
+    const ovrMatrix4f* rightEyeViewMatrix) {
+    // NOTE: This only works for eye-poses with parallel directions - ie. tilt, but NOT canting
+    // TODO: Compute a directional "union" between head and eye-poses so that this does something
+    // more reasoanble for the canted scenario where the eye views are divergent
+    ovrMatrix4f centerViewMatrix = *leftEyeViewMatrix;
+    // set the center point between left and right.
+    centerViewMatrix.M[0][3] = (leftEyeViewMatrix->M[0][3] + rightEyeViewMatrix->M[0][3]) / 2;
+    centerViewMatrix.M[1][3] = (leftEyeViewMatrix->M[1][3] + rightEyeViewMatrix->M[1][3]) / 2;
+    centerViewMatrix.M[2][3] = (leftEyeViewMatrix->M[2][3] + rightEyeViewMatrix->M[2][3]) / 2;
+    return centerViewMatrix;
 }
 
 #endif // OVR_VrApi_Helpers_h

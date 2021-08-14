@@ -385,10 +385,12 @@ typedef enum ovrModeFlags_ {
     VRAPI_MODE_FLAG_CREATE_CONTEXT_NO_ERROR = 0x00100000,
 
     
-    /// The flag will enable phase sync mode for the app, which can manage app's prediction latency
-    /// adaptively, so when app's workload is low, the prediction latency will be low as well
-    /// Note: this mode is only working with vrapi_WaitFrame / vrapi_BeginFrame / vrapi_SubmitFrame
-    /// call pattern. If an app only uses vrapi_SubmitFrame, the mode can't be enabled.
+    /// If set, phase Sync mode will be enabled for the application.
+    /// When Phase sync mode is enabled, prediction latency will be managed adaptively
+    /// such that when the applications's workload is low, the prediction latency will also be low.
+    /// Note: Phase Sync mode should only be enabled if the application is using the
+    /// vrapi_WaitFrame / vrapi_BeginFrame / vrapi_SubmitFrame frame call pattern.
+    /// If an application only calls vrapi_SubmitFrame, the mode can't be enabled.
     VRAPI_MODE_FLAG_PHASE_SYNC = 0x00400000,
 
 } ovrModeFlags;
@@ -579,6 +581,30 @@ typedef enum ovrTextureFormat_ {
 
     } ovrTextureFormat;
 
+typedef enum ovrTextureFilter_ {
+    VRAPI_TEXTURE_FILTER_NEAREST = 0,
+    VRAPI_TEXTURE_FILTER_LINEAR = 1,
+    VRAPI_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR = 2,
+    VRAPI_TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST = 3,
+    VRAPI_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR = 4,
+    } ovrTextureFilter;
+
+typedef enum ovrTextureWrapMode_ {
+    VRAPI_TEXTURE_WRAP_MODE_REPEAT = 0,
+    VRAPI_TEXTURE_WRAP_MODE_CLAMP_TO_EDGE = 1,
+    VRAPI_TEXTURE_WRAP_MODE_CLAMP_TO_BORDER = 2,
+} ovrTextureWrapMode;
+
+typedef struct ovrTextureSamplerState_ {
+    ovrTextureFilter MinFilter;
+    ovrTextureFilter MagFilter;
+    ovrTextureWrapMode WrapModeS;
+    ovrTextureWrapMode WrapModeT;
+    float BorderColor[4];
+    float MaxAnisotropy;
+} ovrTextureSamplerState;
+
+OVR_VRAPI_ASSERT_TYPE_SIZE(ovrTextureSamplerState, 36);
 
 /// Flags supported by vrapi_CreateAndroidSurfaceSwapChain3
 typedef enum ovrAndroidSurfaceSwapChainFlags_ {
@@ -1192,7 +1218,6 @@ OVR_VRAPI_ASSERT_TYPE_SIZE_32_BIT(ovrLayerFishEye2, 472);
 OVR_VRAPI_ASSERT_TYPE_SIZE_64_BIT(ovrLayerFishEye2, 488);
 
 
-
 /// Union that combines ovrLayer types in a way that allows them
 /// to be used in a polymorphic way.
 typedef union ovrLayer_Union2_ {
@@ -1208,6 +1233,7 @@ typedef union ovrLayer_Union2_ {
 
 /// Parameters for frame submission.
 typedef struct ovrSubmitFrameDescription2_ {
+    /// Combination of ovrFrameFlags flags.
     uint32_t Flags;
     uint32_t SwapInterval;
     uint64_t FrameIndex;

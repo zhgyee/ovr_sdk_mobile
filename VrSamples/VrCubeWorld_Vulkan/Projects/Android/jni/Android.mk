@@ -5,7 +5,6 @@ LOCAL_MODULE := vrcubeworldvk
 
 
 LOCAL_CFLAGS += -std=c99 -Werror
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../../../../3rdParty/khronos/vulkan_1.1.100.0
 
 
 LOCAL_SRC_FILES := ../../../Src/Framework_Vulkan.c \

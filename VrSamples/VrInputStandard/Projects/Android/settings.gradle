@@ -2,6 +2,6 @@ rootProject.projectDir = new File(settingsDir, '../../../..')
 rootProject.name = "VrInputStandard"
 
 include ':', \
-	'VrSamples:SampleFramework:Projects:Android', \
+	'SampleFramework:Projects:Android', \
 	'VrSamples:VrInputStandard:Projects:Android'
 

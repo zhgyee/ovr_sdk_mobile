@@ -1249,7 +1249,7 @@ ovrTextureSwapChain* ovrTextureSwapChain_CreateFromKTX(const char* fileName) {
     }
     // only support little endian
     if (header->endianness != 0x04030201) {
-        ALOGE("%s: KTX file has wrong endianess", fileName);
+        ALOGE("%s: KTX file has wrong endianness", fileName);
         free(buffer);
         return NULL;
     }
@@ -1556,7 +1556,8 @@ static ovrLayerProjection2 ovrRenderer_RenderSceneToEyeBuffer(
 static ovrLayerCube2 BuildCubeLayer(
     ovrTextureSwapChain* cubeSwapChain,
     const ovrTracking2* tracking) {
-    const ovrMatrix4f centerEyeViewMatrix = vrapi_GetViewMatrixFromPose(&tracking->HeadPose.Pose);
+    const ovrMatrix4f centerEyeViewMatrix =
+        vrapi_GetCenterViewMatrix(&tracking->Eye[0].ViewMatrix, &tracking->Eye[1].ViewMatrix);
     const ovrMatrix4f cubeMatrix = ovrMatrix4f_TanAngleMatrixForCubeMap(&centerEyeViewMatrix);
 
     ovrLayerCube2 layer = vrapi_DefaultLayerCube2();

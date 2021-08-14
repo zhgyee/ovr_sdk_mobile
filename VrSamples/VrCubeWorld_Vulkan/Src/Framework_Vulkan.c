@@ -2487,9 +2487,11 @@ void InitVertexAttributes(
                     attributes[*attributeCount + location].location = *attributeCount + location;
                     attributes[*attributeCount + location].binding = *bindingCount;
                     attributes[*attributeCount + location].format = (VkFormat)v->attributeFormat;
-                    attributes[*attributeCount + location].offset = (uint32_t)(
-                        location * v->attributeSize /
-                        v->locationCount); // limited offset used for packed vertex data
+                    attributes[*attributeCount + location].offset =
+                        (uint32_t)(location * v->attributeSize / v->locationCount); // limited
+                                                                                    // offset used
+                                                                                    // for packed
+                                                                                    // vertex data
                 }
 
                 bindings[*bindingCount].binding = *bindingCount;

@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# Copyright 2004-present Facebook. All Rights Reserved.
 
 # This first bit of code is common bootstrapping code
 # to determine the SDK root, and to set up the import

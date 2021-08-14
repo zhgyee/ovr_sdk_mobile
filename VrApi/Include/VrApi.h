@@ -818,6 +818,34 @@ OVR_VRAPI_EXPORT unsigned int vrapi_GetTextureSwapChainHandle(
 OVR_VRAPI_EXPORT jobject vrapi_GetTextureSwapChainAndroidSurface(ovrTextureSwapChain* chain);
 
 
+/// Change the sampler state for a texture swapchain after creation.
+///
+/// For the Oculus mobile runtime, composition runs in a separate process from the application,
+/// requiring swapchains to be created in a cross-process friendly way. The mechanism by
+/// which this is done shares the texture image memory between processes, but not the
+/// texture state. This requires an explicit mechanism to synchronize the texture state
+/// between the application and the compositor, where the swapchain image is sampled.
+///
+/// When the application graphics API is OpenGL ES, the call to
+/// 'vrapi_SetTextureSwapChainSamplerState' will update both the application and compositor sampler
+/// state. As such, the application is expected to synchronize the call to
+/// 'vrapi_SetTextureSwapChainSamplerState' with application-side rendering. Similarly, the
+/// compositor will synchronize sampler state update with rendering of the next compositor frame.
+///
+/// When the application graphics API is Vulkan, the call to 'vrapi_SetTextureSwapChainSamplerState'
+/// will only update the sampler state for the compositor process. If the application requires
+/// sampling of the swapchain images, the application will be responsible for updating the texture
+/// sampler state using normal Vulkan mechanisms, and synchronizing appropriately with the
+/// application-side rendering.
+OVR_VRAPI_EXPORT ovrResult vrapi_SetTextureSwapChainSamplerState(
+    ovrTextureSwapChain* chain,
+    const ovrTextureSamplerState* samplerState);
+
+/// Query the current sampler state for a swapchain.
+OVR_VRAPI_EXPORT ovrResult vrapi_GetTextureSwapChainSamplerState(
+    ovrTextureSwapChain* chain,
+    ovrTextureSamplerState* samplerState);
+
 //-----------------------------------------------------------------
 // Frame Submission
 //-----------------------------------------------------------------
@@ -844,7 +872,7 @@ OVR_VRAPI_EXPORT jobject vrapi_GetTextureSwapChainAndroidSurface(ovrTextureSwapC
 ///
 /// To visualize the calling orders
 ///
-/// For mutli-threaded application
+/// For multi-threaded application
 /// Main Thread     |-W(n)--------|-W(n+1)------|--
 /// Render Thread    ----|B(n)-------S(n)|B(n+1)---S(n+1)|
 ///

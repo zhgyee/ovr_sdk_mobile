@@ -32,7 +32,9 @@ limitations under the License.
 #include <cstring> // memcpy
 
 #if defined(OVR_OS_WIN32) || defined(_WIN32) || defined(_WIN64)
+#if !defined(NOMINMAX)
 #define NOMINMAX // stop Windows.h from redefining min and max and breaking std::min / std::max
+#endif
 #include <windows.h> // for MemoryBarrier
 #endif
 

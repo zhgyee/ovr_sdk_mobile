@@ -661,8 +661,8 @@ bool ovrVrInputStandard::AppInit(const OVRFW::ovrAppContext* context) {
 
     auto hapticsButton = createMenu("OnTrigger Haptics", calcButtonPos(0, 2), {400.0f, 100.0f});
     ButtonHandlers[hapticsButton] = [=]() {
-        SampleConfiguration.OnTriggerHapticsState = (HapticStates)(
-            ((int)SampleConfiguration.OnTriggerHapticsState + 1) % NUM_HAPTIC_STATES);
+        SampleConfiguration.OnTriggerHapticsState =
+            (HapticStates)(((int)SampleConfiguration.OnTriggerHapticsState + 1) % NUM_HAPTIC_STATES);
 
         switch (SampleConfiguration.OnTriggerHapticsState) {
             case HapticStates::HAPTICS_BUFFERED:

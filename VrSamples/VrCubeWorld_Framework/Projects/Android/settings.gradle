@@ -3,5 +3,5 @@ rootProject.projectDir = new File(settingsDir, '../../../..')
 rootProject.name = "VrCubeWorld_Framework"
 
 include ':', \
-	'VrSamples:SampleFramework:Projects:Android', \
+	'SampleFramework:Projects:Android', \
 	'VrSamples:VrCubeWorld_Framework:Projects:Android'

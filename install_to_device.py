@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# Copyright 2004-present Facebook. All Rights Reserved.
 
 import os
 import platform

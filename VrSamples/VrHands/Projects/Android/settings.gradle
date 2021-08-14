@@ -3,5 +3,5 @@ rootProject.projectDir = new File(settingsDir, '../../../..')
 rootProject.name = "VrHands"
 
 include ':', \
-	'VrSamples:SampleFramework:Projects:Android', \
+	'SampleFramework:Projects:Android', \
 	'VrSamples:VrHands:Projects:Android'

@@ -59,6 +59,14 @@ inline void LogWithTag(const int prio, const char* tag, const char* fmt, ...) {
     va_end(args);
 
     OutputDebugStringA(buffer);
+#elif defined(OVR_OS_LINUX)
+    OVR_UNUSED(prio);
+    OVR_UNUSED(tag);
+    OVR_UNUSED(fmt);
+#elif defined(OVR_OS_MAC)
+    OVR_UNUSED(prio);
+    OVR_UNUSED(tag);
+    OVR_UNUSED(fmt);
 #else
 #warning "LogWithTag not implemented for this given OVR_OS_"
 #endif
@@ -161,6 +169,14 @@ inline void LogWithFileTag(const int prio, const char* fileTag, const char* fmt,
 
     OutputDebugStringA(buffer);
     OutputDebugStringA("\n");
+#elif defined(OVR_OS_LINUX)
+    OVR_UNUSED(prio);
+    OVR_UNUSED(fileTag);
+    OVR_UNUSED(fmt);
+#elif defined(OVR_OS_MAC)
+    OVR_UNUSED(prio);
+    OVR_UNUSED(fileTag);
+    OVR_UNUSED(fmt);
 #else
 #warning "LogWithFileTag not implemented for this given OVR_OS_"
 #endif
@@ -253,7 +269,7 @@ inline void LogWithFileTag(const int prio, const char* fileTag, const char* fmt,
     }
 #endif
 
-#elif defined(OVR_OS_MAC)
+#elif defined(OVR_OS_MAC) || defined(OVR_OS_LINUX)
 
 #define OVR_LOG(...) \
     {}

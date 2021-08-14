@@ -1,4 +1,6 @@
 #!/usr/bin/python
+# Copyright 2004-present Facebook. All Rights Reserved.
+
 import argparse
 import hashlib
 import locale
@@ -162,13 +164,7 @@ class NoSourceException(Exception):
     pass
 
 
-# 'unicode' is not present with python 3.x
-try:
-    STRING_TYPES = [str, unicode]
-except:
-    STRING_TYPES = [
-        str,
-    ]
+STRING_TYPES = [str]
 
 
 def print_command_line(cmdline):
