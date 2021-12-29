@@ -675,6 +675,7 @@ GlGeometry::Descriptor BuildGlobeDescriptor(
 
     VertexAttribs attribs;
     attribs.position.resize(vertexCount);
+    attribs.normal.resize(vertexCount);
     attribs.uv0.resize(vertexCount);
     attribs.color.resize(vertexCount);
 
@@ -700,10 +701,12 @@ GlGeometry::Descriptor BuildGlobeDescriptor(
                 // Make sure that the wrap seam is EXACTLY the same
                 // xyz so there is no chance of pixel cracks.
                 attribs.position[index] = attribs.position[y * (horizontal + 1) + 0];
+                attribs.normal[index] = attribs.normal[y * (horizontal + 1) + 0];
             } else {
                 attribs.position[index].x = radius * cosf(lon) * cosLat;
                 attribs.position[index].y = radius * sinf(lat);
                 attribs.position[index].z = radius * sinf(lon) * cosLat;
+                attribs.normal[index] = attribs.position[index].Normalized();
             }
 
             // With a normal mapping, half the triangles degenerate at the poles,

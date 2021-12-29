@@ -1266,9 +1266,6 @@ void ovrVrInputStandard::AppRenderFrame(
             RenderRunningFrame(in, out);
             SubmitCompositorLayers(in, out);
         } break;
-        case RENDER_STATE_ENDING: {
-            DefaultRenderFrame_Ending(in, out);
-        } break;
     }
 }
 

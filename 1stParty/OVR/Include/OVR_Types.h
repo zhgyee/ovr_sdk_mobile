@@ -389,20 +389,12 @@ typedef unsigned char jboolean;
 //
 // Compile-time assert; produces compiler error if condition is false.
 // The expression must be a compile-time constant expression.
-// This macro is deprecated in favor of static_assert, which provides better
-// compiler output and works in a broader range of contexts.
+// This macro is deprecated in favor of static_assert.
 //
 // Example usage:
-//     OVR_COMPILER_ASSERT(sizeof(int32_t == 4));
+//     OVR_COMPILER_ASSERT(sizeof(int32_t) == 4);
 
-#define OVR_COMPILER_ASSERT(x) \
-    {                          \
-        int zero = 0;          \
-        switch (zero) {        \
-            case 0:            \
-            case x:;           \
-        }                      \
-    }
+#define OVR_COMPILER_ASSERT(x) static_assert(x, "Assert violated: " #x)
 
 // ------------------------------------------------------------------------
 // ***** OVR_VERIFY_ARRAY_SIZE

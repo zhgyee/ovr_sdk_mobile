@@ -340,6 +340,32 @@ inline jclass ovr_GetLocalClassReferenceWithLoader(
     jobject classLoader,
     const char* className,
     const bool fail = true) {
+    // This is a lambda because if it were at file scope it would need to be inlined since
+    // this is a header, and that could mean the errorMsg[256] declaration could take up
+    // 256 bytes on the stack each time the function is called (which is currently 3x in
+    // this function). Whether or not that is actually the case is up to the compiler and
+    // optimizations, but C++ doesn't guarantee stack variables only take up space within
+    // the code block in which they are declared.
+    auto checkJNIException = [](JNIEnv* jni, const char* fmt, ...) {
+        if (jni->ExceptionOccurred()) {
+            // something else caused a JNI exception before this and didn't clear it
+            if (fmt != nullptr) {
+                char errorMsg[256];
+                va_list argPtr;
+                va_start(argPtr, fmt);
+                vsnprintf(errorMsg, sizeof(errorMsg), fmt, argPtr);
+                va_end(argPtr);
+                OVR_LOG("JNI exception: %s", errorMsg);
+            }
+            jni->ExceptionClear();
+        }
+    };
+
+    checkJNIException(
+        jni,
+        "UNEXPECTED before FindClass( '%s' ) in ovr_GetLocalClassReferenceWithLoader",
+        className);
+
     JavaClass classLoaderClass(jni, jni->FindClass("java/lang/ClassLoader"));
     jmethodID loadClassMethodId = jni->GetMethodID(
         classLoaderClass.GetJClass(), "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;");
@@ -354,6 +380,13 @@ inline jclass ovr_GetLocalClassReferenceWithLoader(
         } else {
             OVR_WARN("FindClass( %s ) failed", className);
         }
+        checkJNIException(jni, "class '%s' not found.", className);
+    } else {
+        // We shouldn't get an exception if the class was found.
+        checkJNIException(
+            jni,
+            "UNEXPECTED after loadClass( '%s' ) in ovr_GetLocalClassReferenceWithLoader!",
+            className);
     }
 
     return localClass;

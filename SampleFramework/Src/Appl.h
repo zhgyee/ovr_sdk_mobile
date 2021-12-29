@@ -54,7 +54,6 @@ class ovrAppl {
     enum ovrRenderState {
         RENDER_STATE_LOADING, // show the loading icon
         RENDER_STATE_RUNNING, // render frames
-        RENDER_STATE_ENDING, // show a black frame transition
     };
 
     ovrAppl(
@@ -202,7 +201,6 @@ class ovrAppl {
     // Default helpers
     void DefaultRenderFrame_Loading(const OVRFW::ovrApplFrameIn& in, OVRFW::ovrRendererOutput& out);
     void DefaultRenderFrame_Running(const OVRFW::ovrApplFrameIn& in, OVRFW::ovrRendererOutput& out);
-    void DefaultRenderFrame_Ending(const OVRFW::ovrApplFrameIn& in, OVRFW::ovrRendererOutput& out);
 
     void ChangeVolume(int volumeDelta);
 

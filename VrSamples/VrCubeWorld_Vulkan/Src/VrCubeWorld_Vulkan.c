@@ -1658,11 +1658,11 @@ void android_main(struct android_app* app) {
 
     vrapi_DestroySystemVulkan();
 
+    vrapi_Shutdown();
+
     ovrVkContext_Destroy(&appState.Context);
     ovrVkDevice_Destroy(&appState.Device);
     ovrVkInstance_Destroy(&instance);
-
-    vrapi_Shutdown();
 
     (*java.Vm)->DetachCurrentThread(java.Vm);
 }

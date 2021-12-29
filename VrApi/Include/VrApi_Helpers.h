@@ -884,6 +884,8 @@ static inline ovrLayerFishEye2 vrapi_DefaultLayerFishEye2() {
 
 
 
+
+
 //-----------------------------------------------------------------
 // Eye view matrix helper functions.
 //-----------------------------------------------------------------

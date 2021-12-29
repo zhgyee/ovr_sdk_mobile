@@ -687,14 +687,6 @@ void ovrAppl::DefaultRenderFrame_Running(const ovrApplFrameIn& in, ovrRendererOu
     ovrFramebuffer_SetNone();
 }
 
-void ovrAppl::DefaultRenderFrame_Ending(const ovrApplFrameIn& in, ovrRendererOutput& out) {
-    NumLayers = 0;
-    FrameFlags = 0u;
-    ovrLayerProjection2 layer = vrapi_DefaultLayerBlackProjection2();
-    Layers[NumLayers++].Projection = layer;
-    FrameFlags |= VRAPI_FRAME_FLAG_FLUSH | VRAPI_FRAME_FLAG_FINAL;
-}
-
 void ovrAppl::HandleVrApiEvents(ovrApplFrameIn& in) {
     ovrEventDataBuffer eventDataBuffer = {};
 

@@ -378,11 +378,7 @@ typedef enum ovrModeFlags_ {
         /// Create a front buffer using the sRGB color space.
     VRAPI_MODE_FLAG_FRONT_BUFFER_SRGB = 0x00080000,
 
-    /// If set, indicates the OpenGL ES Context was created with EGL_CONTEXT_OPENGL_NO_ERROR_KHR
-    /// attribute. The same attribute would be applied when TimeWrap creates the shared context.
-    /// More information could be found at:
-    /// https://www.khronos.org/registry/EGL/extensions/KHR/EGL_KHR_create_context_no_error.txt
-    VRAPI_MODE_FLAG_CREATE_CONTEXT_NO_ERROR = 0x00100000,
+    /// enum 0x00100000 used to be VRAPI_MODE_FLAG_CREATE_CONTEXT_NO_ERROR.
 
     
     /// If set, phase Sync mode will be enabled for the application.
@@ -587,7 +583,10 @@ typedef enum ovrTextureFilter_ {
     VRAPI_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR = 2,
     VRAPI_TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST = 3,
     VRAPI_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR = 4,
-    } ovrTextureFilter;
+    VRAPI_TEXTURE_FILTER_CUBIC = 5,
+    VRAPI_TEXTURE_FILTER_CUBIC_MIPMAP_NEAREST = 6,
+    VRAPI_TEXTURE_FILTER_CUBIC_MIPMAP_LINEAR = 7,
+} ovrTextureFilter;
 
 typedef enum ovrTextureWrapMode_ {
     VRAPI_TEXTURE_WRAP_MODE_REPEAT = 0,
@@ -694,9 +693,7 @@ typedef enum ovrFrameFlags_ {
     VRAPI_FRAME_FLAG_FINAL = 1 << 2,
 
     /// enum 1 << 3 used to be VRAPI_FRAME_FLAG_TIMEWARP_DEBUG_GRAPH_SHOW.
-
     /// enum 1 << 4 used to be VRAPI_FRAME_FLAG_TIMEWARP_DEBUG_GRAPH_FREEZE.
-
     /// enum 1 << 5 used to be VRAPI_FRAME_FLAG_TIMEWARP_DEBUG_GRAPH_LATENCY_MODE.
 
     /// Don't show the volume layer when set.
@@ -966,6 +963,8 @@ typedef struct ovrLayerProjection2_ {
 
 OVR_VRAPI_ASSERT_TYPE_SIZE_32_BIT(ovrLayerProjection2, 312);
 OVR_VRAPI_ASSERT_TYPE_SIZE_64_BIT(ovrLayerProjection2, 328);
+
+
 
 
 

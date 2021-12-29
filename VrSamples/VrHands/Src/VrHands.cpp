@@ -1089,9 +1089,6 @@ void ovrVrHands::AppRenderFrame(const OVRFW::ovrApplFrameIn& in, OVRFW::ovrRende
             RenderRunningFrame(in, out);
             DefaultRenderFrame_Running(in, out);
         } break;
-        case RENDER_STATE_ENDING: {
-            DefaultRenderFrame_Ending(in, out);
-        } break;
     }
 }
 

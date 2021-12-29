@@ -329,7 +329,6 @@ void VrCubeWorld::AppShutdown(const OVRFW::ovrAppContext*) {
     ALOGV("AppShutdown - enter");
     SurfaceRender.Shutdown();
     OVRFW::ovrFileSys::Destroy(FileSys);
-    RenderState = RENDER_STATE_ENDING;
     ALOGV("AppShutdown - exit");
 }
 
@@ -435,9 +434,6 @@ void VrCubeWorld::AppRenderFrame(const OVRFW::ovrApplFrameIn& in, OVRFW::ovrRend
                 /// VRAPI_FRAME_LAYER_FLAG_CHROMATIC_ABERRATION_CORRECTION;
             }
             DefaultRenderFrame_Running(in, out);
-        } break;
-        case RENDER_STATE_ENDING: {
-            DefaultRenderFrame_Ending(in, out);
         } break;
     }
 }

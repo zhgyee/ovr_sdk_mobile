@@ -1387,7 +1387,7 @@ ovrRenderThread
 
 #if MULTI_THREADED
 
-typedef enum { RENDER_FRAME, RENDER_LOADING_ICON, RENDER_BLACK_FINAL } ovrRenderType;
+typedef enum { RENDER_FRAME, RENDER_LOADING_ICON } ovrRenderType;
 
 typedef struct {
     JavaVM* JavaVm;
@@ -1491,12 +1491,6 @@ void* RenderThreadFunction(void* parm) {
             layers[layerCount++].LoadingIcon = iconLayer;
 
             frameFlags |= VRAPI_FRAME_FLAG_FLUSH;
-        } else if (renderThread->RenderType == RENDER_BLACK_FINAL) {
-            ovrLayerProjection2 layer = vrapi_DefaultLayerBlackProjection2();
-            layer.Header.Flags |= VRAPI_FRAME_LAYER_FLAG_INHIBIT_SRGB_FRAMEBUFFER;
-            layers[layerCount++].Projection = layer;
-
-            frameFlags |= VRAPI_FRAME_FLAG_FLUSH | VRAPI_FRAME_FLAG_FINAL;
         }
 
         const ovrLayerHeader2* layerList[ovrMaxLayerCount] = {0};

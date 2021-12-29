@@ -1370,7 +1370,7 @@ static void ovrScene_Create(ovrScene* scene, bool permissionsGranted) {
     // Verify sdcard read permission granted before accessing.
     if (permissionsGranted) {
         scene->CubeMapSwapChain =
-            ovrTextureSwapChain_CreateFromKTX("/sdcard/oculus/cubemap1536.ktx");
+            ovrTextureSwapChain_CreateFromKTX("/sdcard/oculus/cubemap512.ktx");
     }
 
     // Simple checkerboard pattern.

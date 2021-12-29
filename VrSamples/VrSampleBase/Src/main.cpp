@@ -33,7 +33,6 @@ class ovrSampleAppl : public OVRFW::ovrAppl {
     enum ovrRenderState {
         RENDER_STATE_LOADING, // show the loading icon
         RENDER_STATE_RUNNING, // render frames
-        RENDER_STATE_ENDING // show a black frame transition
     };
 
     ovrSampleAppl(
@@ -70,7 +69,6 @@ bool ovrSampleAppl::AppInit(const OVRFW::ovrAppContext* appContext) {
 }
 
 void ovrSampleAppl::AppShutdown(const OVRFW::ovrAppContext*) {
-    RenderState = RENDER_STATE_ENDING;
     ALOGV("AppShutdown - enter");
     ALOGV("AppShutdown - exit");
 }
@@ -97,9 +95,6 @@ void ovrSampleAppl::AppRenderFrame(const OVRFW::ovrApplFrameIn& in, OVRFW::ovrRe
         } break;
         case RENDER_STATE_RUNNING: {
             DefaultRenderFrame_Running(in, out);
-        } break;
-        case RENDER_STATE_ENDING: {
-            DefaultRenderFrame_Ending(in, out);
         } break;
     }
 }
