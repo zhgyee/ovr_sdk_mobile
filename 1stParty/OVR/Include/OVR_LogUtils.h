@@ -59,11 +59,7 @@ inline void LogWithTag(const int prio, const char* tag, const char* fmt, ...) {
     va_end(args);
 
     OutputDebugStringA(buffer);
-#elif defined(OVR_OS_LINUX)
-    OVR_UNUSED(prio);
-    OVR_UNUSED(tag);
-    OVR_UNUSED(fmt);
-#elif defined(OVR_OS_MAC)
+#elif defined(OVR_OS_LINUX) || defined(OVR_OS_MAC)
     OVR_UNUSED(prio);
     OVR_UNUSED(tag);
     OVR_UNUSED(fmt);
@@ -169,11 +165,7 @@ inline void LogWithFileTag(const int prio, const char* fileTag, const char* fmt,
 
     OutputDebugStringA(buffer);
     OutputDebugStringA("\n");
-#elif defined(OVR_OS_LINUX)
-    OVR_UNUSED(prio);
-    OVR_UNUSED(fileTag);
-    OVR_UNUSED(fmt);
-#elif defined(OVR_OS_MAC)
+#elif defined(OVR_OS_LINUX) || defined(OVR_OS_MAC)
     OVR_UNUSED(prio);
     OVR_UNUSED(fileTag);
     OVR_UNUSED(fmt);
@@ -286,9 +278,18 @@ inline void LogWithFileTag(const int prio, const char* fileTag, const char* fmt,
     {}
 #define OVR_ASSERT_WITH_TAG(__expr__, __tag__) \
     {}
-
 #else
 #error "unknown platform"
 #endif
+
+// logs only the first time to avoid spam
+#define OVR_LOG_ONCE(...)                  \
+    {                                      \
+        static bool alreadyLogged = false; \
+        if (!alreadyLogged) {              \
+            OVR_LOG(__VA_ARGS__);          \
+            alreadyLogged = true;          \
+        }                                  \
+    }
 
 #endif // OVRLib_Log_h

@@ -338,8 +338,6 @@ GlProgram GlProgram::Build(
             ALOGW("   GlProgram[ %d ]: Uniforms[%d] NOT BOUND / USED", p.Program, i);
 #endif /// OVR_USE_UNIFORM_NAMES
         }
-
-        OVR_ASSERT(p.Uniforms[i].Location >= 0 && p.Uniforms[i].Binding >= 0);
     }
 
     glUseProgram(0);

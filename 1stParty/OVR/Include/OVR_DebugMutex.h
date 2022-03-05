@@ -460,7 +460,7 @@ class LockGuardMutex {
     }
     ~LockGuardMutex() {
         // we pass a -lineNumber because we cannot get a real line number for the destructor
-        // (since there is no macro explictly coded at the destructor location) and we do
+        // (since there is no macro explicitly coded at the destructor location) and we do
         // not want the guard destructor's unlock reference to be the same as its constructor.
         mutex_.unlock(fileName_.c_str(), -lineNumber_);
     }
